@@ -1,19 +1,5 @@
 <img width="2800" height="1640" alt="Skwd wall cover" src="https://github.com/user-attachments/assets/2d95a1ae-ab01-433a-a21a-57d07a2ccc76" />
 
-> [!IMPORTANT]
-> Skwd-wall v2 beta is here!
-> Join us on [Discord](https://discord.gg/cgxy8EEVmz) if you want to be part of the steering the direction of the beta, report bugs or just chat :)
->
-> Skwd-wall v2 is the most ambitious software I've ever written, and as such I am expecting at least one bug, maybe two. Please don't hesitate to create a GitHub issue for any issues you encounter or suggestions you may have.
->
-> Current known issues / WIP:
->
-> WIP: Wallpaper Engine inconsistencies / bugs in comparison to (the real) Wallpaper Engine. This part of the application is still Work in Progress and does not have perfect coverage yet. Please report any issues you may find with Wallpaper Engine scenes ❤️
->
-> WIP: Debian version
->
-> WIP: A wiki & better documentation. Skwd-wall is packed with tons of features, but almost nothing is explained in detail in writing.
-
 ![Stars](https://img.shields.io/github/stars/liixini/skwd-wall?style=for-the-badge)
 ![License](https://img.shields.io/github/license/liixini/skwd-wall?style=for-the-badge)
 ![Last Commit](https://img.shields.io/github/last-commit/liixini/skwd-wall?style=for-the-badge)
@@ -38,10 +24,25 @@
 ![COSMIC](https://img.shields.io/badge/COSMIC-FFAD00?style=for-the-badge&logo=system76&logoColor=black)
 ![labwc](https://img.shields.io/badge/labwc-555555?style=for-the-badge&logo=wayland&logoColor=white)
 
-### A video is a thousand pictures - Sun Tzu (probably)
+
+> [!IMPORTANT]
+> Skwd-wall v2 beta is here! It is fully functional and extremely performant - but in beta due to me still adding large features. Keep tuned!
+> Join us on [Discord](https://discord.gg/cgxy8EEVmz) if you want to be part of the steering the direction of the beta, report bugs or just chat :)
+
+### A video is a thousand pictures, so many videos are priceless - Ancient proverb (probably)
+
+#### View modes for people that like round, straight and everything in between
+
+<img width="100%" alt="skwd-wall-view-modes" src="https://github.com/user-attachments/assets/7d47df7b-1f8d-4654-9490-9e184df355e4" />
+
+#### Extremely fancy transitions, but there's 48 more for those that like anything between this and a crossfade
+<img width="100%" alt="skwd-wall-drawing" src="https://github.com/user-attachments/assets/05e45882-677a-4f40-bf28-02f16a384f2c" />
+
+<img width="50%" alt="skwd-wall-sand-donut" src="https://github.com/user-attachments/assets/700a5599-065d-4961-a5f5-d272c08f0ab7" /><img width="50%" alt="skwd-wall-photo-transitions" src="https://github.com/user-attachments/assets/5c082aa5-d946-4b7d-b613-488ee1afcb64" />
 
 
 
+### See most features in under 2 minutes
 https://github.com/user-attachments/assets/46efe308-806d-466d-8834-3052134f00eb
 
 
