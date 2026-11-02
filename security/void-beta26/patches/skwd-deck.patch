@@ -1,0 +1,156 @@
+--- a/crates/skwd-steam/Cargo.toml
++++ b/crates/skwd-steam/Cargo.toml
+@@ -9,7 +9,7 @@
+ steamworks = { workspace = true }
+ serde = { version = "1", features = ["derive"] }
+ serde_json = { workspace = true }
+-tokio = { version = "1", default-features = false, features = ["rt", "macros", "time"] }
++tokio = { version = "1.53.3", default-features = false, features = ["rt", "macros", "time"] }
+ 
+ [lints]
+ workspace = true
+--- a/crates/skwd-wall-effects/Cargo.toml
++++ b/crates/skwd-wall-effects/Cargo.toml
+@@ -12,7 +12,7 @@
+ anyhow = "1"
+ webp = "0.3"
+ rayon = "1"
+-tokio = { version = "1", default-features = false, features = ["rt", "macros", "process", "io-util"] }
++tokio = { version = "1.53.3", default-features = false, features = ["rt", "macros", "process", "io-util"] }
+ 
+ [[bin]]
+ name = "skwd-wall-effects"
+--- a/crates/skwd-wall-scan/Cargo.toml
++++ b/crates/skwd-wall-scan/Cargo.toml
+@@ -19,12 +19,12 @@
+ env_logger = "0.11"
+ libc = "0.2"
+ rayon = "1"
+-tokio = { version = "1", default-features = false, features = ["rt", "net", "io-util", "io-std", "process", "sync", "time"] }
++tokio = { version = "1.53.3", default-features = false, features = ["rt", "net", "io-util", "io-std", "process", "sync", "time"] }
+ ureq = { version = "2", default-features = false, features = ["tls", "gzip"] }
+ dhat = { workspace = true, optional = true }
+ 
+ [dev-dependencies]
+-tokio = { version = "1", default-features = false, features = ["macros"] }
++tokio = { version = "1.53.3", default-features = false, features = ["macros"] }
+ 
+ [features]
+ obs-heap = ["skwd-wall-core/obs-heap"]
+--- a/crates/skwd-walld/Cargo.toml
++++ b/crates/skwd-walld/Cargo.toml
+@@ -21,7 +21,7 @@
+ log = "0.4"
+ env_logger = "0.11"
+ libc = "0.2"
+-tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "net", "process", "sync", "time", "io-util", "macros", "test-util"] }
++tokio = { version = "1.53.3", default-features = false, features = ["rt-multi-thread", "net", "process", "sync", "time", "io-util", "macros", "test-util"] }
+ wayland-client = "0.31"
+ wayland-protocols-wlr = { version = "0.3", features = ["client"] }
+ wayland-protocols = { version = "0.32", features = ["client", "unstable", "staging"] }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2067,9 +2067,9 @@
+ 
+ [[package]]
+ name = "rustls-webpki"
+-version = "0.103.15"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "f3c3cf1d8b1e7d4927e2d154c3fcb02979afb9939629c62cd9048d4f07b60ac2"
++version = "0.103.16"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4443b1b6d39d7c663139942cc4558262562d2c84123bb6282ef177009ca8b281"
+ dependencies = [
+  "ring",
+  "rustls-pki-types",
+@@ -2675,9 +2675,9 @@
+ 
+ [[package]]
+ name = "tokio"
+-version = "1.53.1"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "202caea871b69668250d242070849eb495be178ed697a3e98aebce5bc81a0bed"
++version = "1.53.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
+ dependencies = [
+  "bytes",
+  "libc",
+@@ -3095,14 +3095,14 @@
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
+ dependencies = [
+- "webpki-roots 1.0.8",
++ "webpki-roots 1.0.10",
+ ]
+ 
+ [[package]]
+ name = "webpki-roots"
+-version = "1.0.8"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "bf85cb06032201fa7c6f829d7db5a7e5aa45bcc0655327713065f6f0576731bf"
++version = "1.0.10"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1c1c8e20c8a38fc7d65abfe74eb7280e4aa667e8eec8bc84996d2874810748d9"
+ dependencies = [
+  "rustls-pki-types",
+ ]
+--- /dev/null
++++ b/crates/skwd-walld/tests/asyncfd_lifecycle.rs
+@@ -0,0 +1,56 @@
++#![cfg(target_os = "linux")]
++
++use std::io::{Read, Write};
++use std::os::fd::{AsFd, AsRawFd, OwnedFd};
++use std::os::unix::net::UnixStream;
++use std::time::Duration;
++use tokio::io::unix::AsyncFd;
++use tokio::io::Interest;
++use tokio::time::timeout;
++
++// One test keeps descriptor-reuse assertions in this test process sequential.
++#[tokio::test(flavor = "current_thread")]
++async fn owned_registration_survives_cancellation_and_closes_on_drop() -> std::io::Result<()> {
++    let (original, mut peer) = UnixStream::pair()?;
++    original.set_nonblocking(true)?;
++    peer.set_nonblocking(true)?;
++    let owned = original.as_fd().try_clone_to_owned()?;
++    // Match the original production constructor with an owned, stable descriptor.
++    let registered = AsyncFd::new(owned)?;
++
++    assert!(timeout(Duration::from_millis(20), registered.readable()).await.is_err());
++    drop(original);
++    peer.write_all(b"x")?;
++    let ready = timeout(Duration::from_secs(2), registered.readable())
++        .await
++        .expect("duplicate lost readiness after original was closed")?;
++    drop(ready);
++    let mut reader = UnixStream::from(registered.get_ref().try_clone()?);
++    let mut byte = [0];
++    reader.read_exact(&mut byte)?;
++    assert_eq!(byte, [b'x']);
++    drop(reader);
++    drop(registered);
++    assert_eq!(peer.read(&mut byte)?, 0);
++
++    // A regular file supplies a valid descriptor that epoll cannot register.
++    let owned = OwnedFd::from(std::fs::File::open("/dev/null")?);
++    let number = owned.as_raw_fd();
++    let error = AsyncFd::new(owned).expect_err("/dev/null is not pollable");
++    assert_eq!(error.raw_os_error(), Some(libc::EPERM));
++    let link = std::path::PathBuf::from(format!("/proc/self/fd/{number}"));
++    assert_eq!(link.read_link().unwrap_err().kind(), std::io::ErrorKind::NotFound);
++
++    // Register a new owner after the old registration has been fully dropped.
++    let (replacement, mut replacement_peer) = UnixStream::pair()?;
++    replacement.set_nonblocking(true)?;
++    let owned = OwnedFd::from(replacement);
++    let replacement = AsyncFd::with_interest(owned, Interest::READABLE)?;
++    replacement_peer.write_all(b"y")?;
++    let ready = timeout(Duration::from_secs(2), replacement.readable())
++        .await
++        .expect("new registration lost readiness")?;
++    drop(ready);
++    drop(replacement);
++    Ok(())
++}

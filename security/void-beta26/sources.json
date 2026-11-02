@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0-beta.26",
+  "original_archive_sha256": "681f81332824657307201c922cbe5c4566267d4ceb5a507647d37b6c35b49b46",
+  "commits": {
+    "wall": "780f2d3f53025318cbbaff1d1aa369e622e5e8fd",
+    "deck": "3e8df6dd517e676b6474c0e24bd9a4ce2d28fdc3",
+    "lens": "89c62da9e420669d0e0c5603b36e2fc0f7b691e5",
+    "paper": "d7cbbbf403036a071e005a53ffc2c4da036a68de"
+  },
+  "official_release": false
+}
