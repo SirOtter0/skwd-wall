@@ -425,3 +425,9 @@ Achno for [Gowall](https://github.com/Achno/gowall) which I have reimplemented u
 InioX for [Matugen](https://github.com/InioX/matugen) that powers a lot of the WIP bridges between Pywal et. al. that I'm building.
 
 Kian Blakey for [Pibble](https://github.com/kianblakley/pibble) which the view mode Depth is heavily based on.
+
+## Void Linux (community port)
+
+Native x86_64 glibc XBPS packaging, manual/session-local operation without systemd,
+and validation limitations are documented in [packaging/void](packaging/void/README.md).
+This community port is not an official Skwd release or a Void repository package.

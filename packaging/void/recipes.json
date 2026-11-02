@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0beta26_3",
+  "architecture": "x86_64",
+  "private_sonames": [
+    "libavcodec.so.63",
+    "libavformat.so.63",
+    "libavutil.so.61",
+    "libswresample.so.7",
+    "libswscale.so.10"
+  ],
+  "components": {
+    "wall": {
+      "package": "skwd-wall-v2-local",
+      "binaries": {
+        "skwd-wall": "usr/bin/skwd-wall-v2"
+      },
+      "dlopen_dependencies": [
+        "fontconfig",
+        "wayland",
+        "libxkbcommon",
+        "vulkan-loader",
+        "libglvnd"
+      ],
+      "license": "MIT, Apache-2.0, MPL-2.0, OFL-1.1, CC-BY-4.0, Zlib"
+    },
+    "deck": {
+      "package": "skwd-deck-local",
+      "binaries": {
+        "skwd-walld": "usr/bin/skwd-walld",
+        "skwd-wall-scan": "usr/bin/skwd-wall-scan",
+        "skwd-wall-effects": "usr/bin/skwd-wall-effects",
+        "skwd-helm": "usr/bin/skwd-helm"
+      },
+      "dlopen_dependencies": [],
+      "license": "MIT, Apache-2.0, MPL-2.0, WTFPL"
+    },
+    "lens": {
+      "package": "skwd-lens-local",
+      "binaries": {
+        "skwd-lens": "usr/bin/skwd-lens"
+      },
+      "dlopen_dependencies": [],
+      "license": "MIT, Apache-2.0, CC-BY-4.0"
+    },
+    "paper": {
+      "package": "skwd-paper-local",
+      "binaries": {
+        "skwd-paper": "usr/bin/skwd-paper-v2",
+        "skwd-paper-tinier": "usr/lib/skwd-paper/skwd-paper-tinier",
+        "skwd-wall-vk": "usr/bin/skwd-wall-vk",
+        "skwd-wall-still": "usr/bin/skwd-wall-still"
+      },
+      "dlopen_dependencies": [
+        "vulkan-loader",
+        "libglvnd"
+      ],
+      "license": "MIT, LGPL-2.1-or-later, BSD-2-Clause, BSD-3-Clause, WTFPL"
+    }
+  }
+}
