@@ -12,13 +12,20 @@ Vulkan for Wall/animated renderers, and the appropriate graphics driver. Static
 validated for Wall; this does not validate Paper hardware video decoding.
 X11 wallpaper support and musl/other architectures are not claimed.
 
-Build tools: base-devel, Rust/Cargo (tested 1.99.0), bubblewrap, Python 3, patch,
-cmake, nasm, patchelf, pkg-config, glslc, Vulkan-Headers, vulkan-loader-devel,
-libva-devel, alsa-lib-devel, pulseaudio-devel, libyuv-devel and libclang/Clang.
-Some are already installed through the other development packages. Inspect XBPS's
-transaction before installing build prerequisites; these scripts never install them.
-LLVM 19 was tested; build.sh accepts LIBCLANG_PATH and CLANG_RESOURCE_DIR overrides.
-No compatibility symlinks or replacement system libraries are used.
+Build prerequisites (install inside the build environment, not on an unrelated host):
+
+```sh
+sudo xbps-install -n base-devel git curl python3 rust cargo bubblewrap patch cmake nasm patchelf pkg-config shaderc Vulkan-Headers vulkan-loader-devel libva-devel alsa-lib-devel pulseaudio-devel libyuv-devel clang19 libclang19 clang19-headers fontconfig-devel libxkbcommon-devel wayland-devel libdrm-devel libglvnd-devel libdav1d-devel zlib-devel
+# Review the transaction, then repeat without -n to install.
+```
+
+`glslc` is supplied by **shaderc**, not a package named glslc. LLVM 19's runtime
+and resource headers need **libclang19** and **clang19-headers**; the unversioned
+clang/libclang meta-packages may select another major version. Fontconfig/XKB/Wayland development files and the FFmpeg modules libdrm, dav1d
+and zlib are explicit clean-build requirements; do not assume that a desktop
+already installed them. LLVM 19 is the
+explicit default in build.sh. For another installed version set LIBCLANG_PATH and
+CLANG_RESOURCE_DIR together. No compatibility symlinks are needed.
 
 The four declarative recipes live in `recipes.json`; `package.py` assembles them.
 Runtime dependencies are derived from ELF DT_NEEDED and XBPS shlib providers, plus
@@ -30,13 +37,32 @@ ONNX Runtime and model pack; these are not downloaded or bundled automatically.
 
 ## Prepare and build
 
-Use an authenticated coordinated suite archive matching the hash in
-`security/void-beta26/sources.json`; do not use an arbitrary GitHub branch archive.
-Obtaining that archive from upstream is a prerequisite, not an implicit download.
-Build as a normal user in a clean Void environment with adequate disk space.
+Obtain the pinned coordinated source asset over HTTPS from the official release.
+A GitHub branch archive is **not** that suite (it lacks coordinated companions/vendor).
+The URL, byte size and independently pinned hash are in
+`security/void-beta26/sources.json`. No private source archive or previous cache is required.
 
 ```sh
-python3 packaging/void/prepare-source.py /path/to/official-suite.tar.xz "$PWD/work/source" --fetch-missing-crates
+curl --fail --location --proto '=https' --proto-redir '=https' \
+  -o official-suite.tar.xz \
+  https://github.com/liixini/skwd-wall/releases/download/v1.0.0-beta.26/skwd-suite-1.0.0-beta.26.tar.xz
+python3 - <<'CHECK'
+import hashlib,json,pathlib
+m=json.loads(pathlib.Path('security/void-beta26/sources.json').read_text())
+p=pathlib.Path('official-suite.tar.xz')
+assert p.stat().st_size == m['archive_bytes']
+with p.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest() == m['original_archive_sha256']
+CHECK
+mkdir -p work/build
+```
+
+The official release API also publishes the same SHA-256 asset digest. This is
+HTTPS origin verification plus a pinned hash, **not** a claim of a detached GPG
+signature. If your policy requires a separate signing identity, authenticate that
+through upstream before building. Build as a normal user in a clean Void environment.
+
+```sh
+python3 packaging/void/prepare-source.py official-suite.tar.xz "$PWD/work/source" --fetch-missing-crates
 for component in wall deck lens paper; do
   packaging/void/build.sh "$PWD/work/source/suite" "$PWD/work/build/$component" "$component"
 done

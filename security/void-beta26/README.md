@@ -17,9 +17,11 @@ historical audit. They are not fixed or waived by this packaging contribution.
 Selected TLS regressions passed with ring and AWS-LC; see the validation summary.
 No claim of a currently clean cargo-audit or complete security audit is made.
 
-Obtain the coordinated official beta.26 source archive from the maintainer's release
-publication, authenticate its release manifest/signature independently, and verify
-its SHA-256 against sources.json. Individual GitHub repos may not expose every
+Obtain the coordinated official beta.26 source archive from the public release URL
+in sources.json over HTTPS, then verify its byte size and pinned SHA-256 as shown
+in packaging/void/README.md. GitHub's release API publishes the matching asset
+digest. This method does not claim a detached GPG signature; apply any stronger
+signing-identity policy separately before building. Individual GitHub repos may not expose every
 coordinated revision. Do not substitute current branch heads. This fork does not
 publish the original or derived archive, vendor tree, binaries, private releases,
 credentials or test-only TLS dependency bundles.

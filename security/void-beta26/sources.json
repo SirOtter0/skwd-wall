@@ -7,5 +7,8 @@
     "lens": "89c62da9e420669d0e0c5603b36e2fc0f7b691e5",
     "paper": "d7cbbbf403036a071e005a53ffc2c4da036a68de"
   },
-  "official_release": false
+  "official_release": false,
+  "archive_url": "https://github.com/liixini/skwd-wall/releases/download/v1.0.0-beta.26/skwd-suite-1.0.0-beta.26.tar.xz",
+  "archive_bytes": 139657568,
+  "release_url": "https://github.com/liixini/skwd-wall/releases/tag/v1.0.0-beta.26"
 }
