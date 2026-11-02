@@ -12,8 +12,18 @@ def extract(archive,dest,root=None):
    if n.is_absolute() or '..' in n.parts or m.issym() or m.islnk() or not (m.isfile() or m.isdir()):raise ValueError('Unexpected archive member: '+m.name)
    if root and n.parts[0]!=root:raise ValueError('Unexpected archive root')
   t.extractall(dest,filter='data')
+def prepare_ffmpeg(suite,pin,fetch):
+ target=suite/pin['path']
+ if not target.exists():
+  if not fetch:raise ValueError('FFmpeg source missing; prepare into a NEW destination with --fetch-ffmpeg before offline builds')
+  target.parent.mkdir(parents=True,exist_ok=True)
+  with urllib.request.urlopen(pin['url'],timeout=60) as response,target.open('xb') as output:
+   while chunk:=response.read(1024*1024):output.write(chunk)
+ if target.is_symlink() or sha(target)!=pin['sha256']:raise ValueError('FFmpeg source checksum mismatch')
+ return {'version':pin['version'],'path':pin['path'],'sha256':sha(target)}
+
 def main():
- a=argparse.ArgumentParser(description=__doc__);a.add_argument('archive',type=pathlib.Path);a.add_argument('destination',type=pathlib.Path);a.add_argument('--fetch-missing-crates',action='store_true',help='Allow exact lockfile crates from static.crates.io; checksum verified before extraction');x=a.parse_args()
+ a=argparse.ArgumentParser(description=__doc__);a.add_argument('archive',type=pathlib.Path);a.add_argument('destination',type=pathlib.Path);a.add_argument('--fetch-missing-crates',action='store_true',help='Allow exact lockfile crates from static.crates.io; checksum verified before extraction');a.add_argument('--fetch-ffmpeg',action='store_true',help='Download the pinned official FFmpeg source before offline builds');x=a.parse_args()
  assert os.getuid()!=0,'Do not run as root'
  pins=json.loads((P/'sources.json').read_text());assert sha(x.archive)==pins['original_archive_sha256'],'Wrong official suite archive'
  dest=x.destination.absolute();assert not dest.exists() and not dest.is_symlink();dest.parent.mkdir(parents=True,exist_ok=True);dest.mkdir(mode=0o700)
@@ -42,6 +52,7 @@ def main():
   extract(archive,vendor,name+'-'+version)
   files={str(f.relative_to(folder)):sha(f) for f in folder.rglob('*') if f.is_file() and f.name!='.cargo-checksum.json'}
   (folder/'.cargo-checksum.json').write_text(json.dumps({'package':checksum,'files':files}))
- manifest={'original_archive_sha256':pins['original_archive_sha256'],'commits':pins['commits'],'locks':{c:sha(suite/('skwd-'+c)/'Cargo.lock') for c in ['wall','deck','lens','paper']},'patches':{p.name:sha(p) for p in (P/'patches').glob('*.patch')}}
+ ffmpeg=prepare_ffmpeg(suite,pins['ffmpeg'],x.fetch_ffmpeg)
+ manifest={'ffmpeg':ffmpeg,'original_archive_sha256':pins['original_archive_sha256'],'commits':pins['commits'],'locks':{c:sha(suite/('skwd-'+c)/'Cargo.lock') for c in ['wall','deck','lens','paper']},'patches':{p.name:sha(p) for p in (P/'patches').glob('*.patch')}}
  (dest/'sources.json').write_text(json.dumps(manifest,indent=2)+'\n');print(suite)
 if __name__=='__main__':main()

@@ -10,5 +10,11 @@
   "official_release": false,
   "archive_url": "https://github.com/liixini/skwd-wall/releases/download/v1.0.0-beta.26/skwd-suite-1.0.0-beta.26.tar.xz",
   "archive_bytes": 139657568,
-  "release_url": "https://github.com/liixini/skwd-wall/releases/tag/v1.0.0-beta.26"
+  "release_url": "https://github.com/liixini/skwd-wall/releases/tag/v1.0.0-beta.26",
+  "ffmpeg": {
+    "version": "9.0.1",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz",
+    "sha256": "cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635",
+    "path": "vendor-ffmpeg/ffmpeg-9.0.1.tar.xz"
+  }
 }

@@ -17,9 +17,13 @@ done
 libclang=${LIBCLANG_PATH:-/usr/lib/llvm/19/lib}
 resource_dir=${CLANG_RESOURCE_DIR:-/usr/lib/llvm/19/lib/clang/19}
 [[ -d $libclang && -f $resource_dir/include/stddef.h ]] && compgen -G "$libclang/libclang.so*" >/dev/null || { echo 'Set LIBCLANG_PATH and CLANG_RESOURCE_DIR for installed libclang' >&2; exit 1; }
-python3 - "$suite" <<'CHECK'
+python3 - "$suite" "$component" <<'CHECK'
 import pathlib,json,hashlib,sys
 p=pathlib.Path(sys.argv[1]);m=json.loads((p.parent/'sources.json').read_text())
+if sys.argv[2] in ['deck','paper']:
+ f=m['ffmpeg'];archive=p/f['path']
+ assert archive.is_file() and not archive.is_symlink(), 'Prepare the pinned FFmpeg source before offline builds'
+ assert hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()==f['sha256'], 'FFmpeg checksum mismatch'
 for c,h in m['locks'].items():
  assert hashlib.file_digest((p/('skwd-'+c)/'Cargo.lock').open('rb'),'sha256').hexdigest()==h
 CHECK
@@ -39,7 +43,7 @@ nice -n 10 bwrap --unshare-all --die-with-parent --new-session \
     --setenv CARGO_NET_OFFLINE true --setenv CARGO_BUILD_JOBS 2 \
     --setenv CARGO_PROFILE_RELEASE_PANIC abort \
     --setenv SKWD_FFMPEG_JOBS 2 --setenv SKWD_KEEP_TARGET 1 \
-    --setenv SKWD_FFMPEG_TARBALL /work/suite/dependencies/ffmpeg-9.0.1.tar.xz \
+    --setenv SKWD_FFMPEG_TARBALL /work/suite/vendor-ffmpeg/ffmpeg-9.0.1.tar.xz \
     --setenv SHADERC_LIB_DIR /usr/lib \
     --setenv LIBCLANG_PATH "$libclang" \
     --setenv BINDGEN_EXTRA_CLANG_ARGS -resource-dir="$resource_dir" \

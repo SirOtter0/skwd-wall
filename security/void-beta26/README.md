@@ -37,3 +37,9 @@ rebuild of these objects has not been demonstrated.
 Public Void maintenance is intended to remain in this fork. The maintainer can
 review/copy this packaging into the private release repository manually; there is
 no claim that this integration has been accepted or shipped officially.
+
+The official coordinated archive does not contain FFmpeg's source tarball.
+Pass --fetch-ffmpeg during preparation to obtain the exact official 9.0.1 archive
+and verify the hash recorded in sources.json and upstream's FFmpeg build recipe.
+Deck/Paper builds subsequently consume it offline; no system FFmpeg replacement
+or network-enabled build fallback is used.

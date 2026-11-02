@@ -62,7 +62,7 @@ signature. If your policy requires a separate signing identity, authenticate tha
 through upstream before building. Build as a normal user in a clean Void environment.
 
 ```sh
-python3 packaging/void/prepare-source.py official-suite.tar.xz "$PWD/work/source" --fetch-missing-crates
+python3 packaging/void/prepare-source.py official-suite.tar.xz "$PWD/work/source" --fetch-missing-crates --fetch-ffmpeg
 for component in wall deck lens paper; do
   packaging/void/build.sh "$PWD/work/source/suite" "$PWD/work/build/$component" "$component"
 done
@@ -71,7 +71,11 @@ python3 packaging/void/package.py --build-root "$PWD/work/build" --output "$PWD/
 
 Create `work/build` beforehand. Every build/output destination must be new.
 Source preparation may download exact checksummed crates only when explicitly
-requested. The four builds run in bubblewrap without network, HOME, graphics or
+requested. `--fetch-ffmpeg` additionally obtains the pinned FFmpeg source from
+ffmpeg.org and verifies its SHA-256 before any build; the original coordinated
+suite does not include that archive. Its path/hash are recorded in the prepared
+manifest. Deck and Paper fail their preflight if it is missing or modified.
+The four builds run in bubblewrap without network, HOME, graphics or
 root privileges, using Cargo --frozen and vendored dependencies. They preserve
 separate per-component build trees, avoiding stage cleanup between components.
 The builder does not claim deterministic binary output. Review generated metadata,
