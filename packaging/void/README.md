@@ -37,6 +37,15 @@ ONNX Runtime and model pack; these are not downloaded or bundled automatically.
 
 ## Prepare and build
 
+Obtain this port's public recipes first, then run the following commands from the
+repository root. Record the commit used for both builds:
+
+```sh
+git clone --branch feat/void-linux-support --single-branch https://github.com/SirOtter0/skwd-wall.git
+cd skwd-wall
+git rev-parse HEAD
+```
+
 Obtain the pinned coordinated source asset over HTTPS from the official release.
 A GitHub branch archive is **not** that suite (it lacks coordinated companions/vendor).
 The URL, byte size and independently pinned hash are in
@@ -78,7 +87,9 @@ manifest. Deck and Paper fail their preflight if it is missing or modified.
 The four builds run in bubblewrap without network, HOME, graphics or
 root privileges, using Cargo --frozen and vendored dependencies. They preserve
 separate per-component build trees, avoiding stage cleanup between components.
-The builder does not claim deterministic binary output. Review generated metadata,
+Two clean builds produced identical ELF files and, after timestamp normalization,
+identical XBPS archives in the documented environment. This is not a guarantee for
+other toolchains or system-package versions. Review generated metadata,
 package licenses, dependency versions and hashes before redistribution.
 
 ## Install XBPS archives
@@ -187,3 +198,34 @@ uninstalling packages alone does not reverse arbitrary hooks or personal theme e
 Update by reviewing a new coordinated suite, reapplying only compatible patches,
 rerunning relevant tests and rebuilding all coordinated packages together. Never
 silently substitute private/missing revisions or update Cargo.lock to branch heads.
+
+## Repeatability check
+
+Use the same verified prepared suite and installed build-package versions for both
+runs. Do not install/update build dependencies between A and B. Every component
+gets its own source copy, Cargo home and target directory; no previous build cache
+is an input. For example, after source preparation:
+
+```sh
+xbps-query -l > work/build-environment.txt
+for attempt in A B; do
+  mkdir -p "$PWD/work/$attempt"
+  for component in wall deck lens paper; do
+    packaging/void/build.sh "$PWD/work/source/suite" "$PWD/work/$attempt/$component" "$component"
+  done
+  python3 packaging/void/package.py --build-root "$PWD/work/$attempt" --output "$PWD/work/xbps-$attempt"
+done
+python3 packaging/void/compare.py work/xbps-A work/xbps-B --output work/comparison.json
+```
+
+The comparator checks archive integrity against generated inventories, payload
+names/hashes/link targets/permissions/ownership, dependency versions, ELF hashes,
+XBPS properties and archive hashes. Timestamp differences are reported separately.
+Functional installation/runtime tests remain separate: two matching broken builds
+are not proof of a working package. A different archive hash must not be described
+as bit-identical XBPS output even when the executables match.
+
+The packager normalizes staged file, directory and symlink timestamps to
+`SOURCE_DATE_EPOCH` (default `1792079636`, matching the pinned build wrapper).
+Use the same epoch in both runs. This changes archive metadata, not executable
+contents. See [independent results and hashes](INDEPENDENT-VALIDATION.md).

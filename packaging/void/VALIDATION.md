@@ -3,6 +3,11 @@
 Tested platform: Void Linux x86_64 glibc/runit, Rust/Cargo 1.99.0.
 This is a community port, not an accepted official Skwd release.
 
+The subsequent [independent clean-VM validation](INDEPENDENT-VALIDATION.md)
+records fresh public-source builds, clean installation/removal and a separate
+Labwc/Pixman/Lavapipe functional test. Historical checks below remain distinct
+from that run.
+
 | Area | Result |
 |---|---|
 | Builds | Wall, Deck, Lens and Paper compiled individually, offline, without privileges in bubblewrap |
@@ -14,7 +19,7 @@ This is a community port, not an accepted official Skwd release.
 | Tests/Clippy | Known compiler lints/AsyncFd deprecations remain. No new unsafe AsyncFd adaptation is included. Passing builds or selected tests are not a complete security audit |
 
 Not yet validated: Paper video/Wallpaper Engine scenes/NVIDIA hardware decoding,
-Lens semantic inference, every Wayland compositor, X11 wallpaper support, package
+Lens semantic inference, every Wayland compositor, X11 wallpaper support, cross-environment
 bit-for-bit reproducibility, other architectures or musl. Noctalia Greeter/XFCE
 custom synchronization is explicitly outside the port.
 
@@ -24,10 +29,9 @@ samples and the supervisor's in-memory summary were not. Do not claim an exhaust
 network audit. A corrected temporary supervisor was used for the subsequent static
 Paper check; this host-specific harness and personal desktop data are not published.
 
-The public packaging CLI now accepts explicit build/output directories rather than
+The public packaging CLI accepts explicit build/output directories rather than
 requiring a particular workstation. Its payload assembly is derived from the tested
-packager. These portability changes do not claim a second full rebuild of unchanged
-Rust sources. Package dependency minima are obtained from the build machine's XBPS
+packager. Package dependency minima are obtained from the build machine's XBPS
 providers; use a clean supported Void build environment when producing releases.
 
 The public source preparation was exercised against the pinned official archive:

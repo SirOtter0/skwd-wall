@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Prepare experimental XBPS archives in artifacts/. Never install packages."""
+"""Assemble experimental XBPS archives from explicit build roots; never install."""
 import argparse
 import hashlib
 import json
@@ -11,14 +11,13 @@ import shutil
 import stat
 import subprocess
 
-ROOT = Path(__file__).resolve().parents[2]
-OUTPUT = ROOT / "artifacts/validation-final/xbps"
 RECIPES = json.loads((Path(__file__).parent / "recipes.json").read_text())
 VERSION = RECIPES["version"]
 PRIVATE = set(RECIPES["private_sonames"])
 NAMES = {c: r["package"] for c, r in RECIPES["components"].items()}
 BINS = {c: r["binaries"] for c, r in RECIPES["components"].items()}
 DLOPEN = {c: r["dlopen_dependencies"] for c, r in RECIPES["components"].items()}
+SOURCE_DATE_EPOCH = int(os.environ.get("SOURCE_DATE_EPOCH", "1792079636"))
 
 
 def sha(path):
@@ -43,9 +42,16 @@ def run(*args):
     return subprocess.check_output(args, text=True)
 
 
+def normalize_timestamps(stage, epoch):
+    """Discard build/copy times without changing payload bytes or link targets."""
+    if epoch < 0:
+        raise ValueError("SOURCE_DATE_EPOCH must not be negative")
+    for path in [*stage.rglob("*"), stage]:
+        os.utime(path, (epoch, epoch), follow_symlinks=False)
+
+
 def main():
     assert os.getuid() != 0, "Do not run as root"
-    global OUTPUT
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--build-root", type=Path, required=True,
                         help="Directory containing wall/suite, deck/suite, lens/suite, paper/suite")
@@ -169,10 +175,14 @@ def main():
                    f"Experimental local Skwd {component} beta.26 for Void Linux", "-l", license_value,
                    "-H", f"https://github.com/liixini/skwd-{component}", "-B", "local Void glibc; Rust 1.99.0; security.2",
                    "-D", " ".join(runtime_dependencies), "--shlib-requires", " ".join(sorted(public)), str(stage)]
-        process = subprocess.run(command, cwd=repository, capture_output=True, text=True)
+        normalize_timestamps(stage, SOURCE_DATE_EPOCH)
+        environment = dict(os.environ, SOURCE_DATE_EPOCH=str(SOURCE_DATE_EPOCH))
+        process = subprocess.run(command, cwd=repository, capture_output=True, text=True,
+                                 env=environment)
         archive = repository / f"{name}-{VERSION}.x86_64.xbps"
         item = {"name": name, "component": component, "version": VERSION, "command": command,
                 "exit_code": process.returncode, "stdout": process.stdout, "stderr": process.stderr,
+                "source_date_epoch": SOURCE_DATE_EPOCH,
                 "dependencies": runtime_dependencies, "shlib_requires": sorted(public),
                 "dlopen_dependencies": DLOPEN[component], "elf": elf, "payload": payload,
                 "existing_file_collisions": collisions, "stage": str(stage), "archive": str(archive),
