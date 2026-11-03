@@ -1,3 +1,16 @@
+## Void Linux — community port
+
+> [!WARNING]
+> This is an independent, work-in-progress port for **Void Linux (x86_64 glibc, runit)**, not an official Skwd-wall release or a package in Void Linux's official repositories. Do not assume installable binary releases are available yet.
+
+This fork contains Void Linux packaging and build work for Skwd-wall v2. For the port's build recipes, validation status, limitations, and session-local operation without systemd, see **[Void Linux packaging documentation](packaging/void/README.md)**.
+
+Skwd-wall itself is developed by **[liixini](https://github.com/liixini/skwd-wall)**. The original project documentation is retained below.
+
+---
+
+## Original Skwd-wall project documentation
+
 <img width="2800" height="1640" alt="Skwd wall cover" src="https://github.com/user-attachments/assets/2d95a1ae-ab01-433a-a21a-57d07a2ccc76" />
 
 ![Stars](https://img.shields.io/github/stars/liixini/skwd-wall?style=for-the-badge)
@@ -425,9 +438,3 @@ Achno for [Gowall](https://github.com/Achno/gowall) which I have reimplemented u
 InioX for [Matugen](https://github.com/InioX/matugen) that powers a lot of the WIP bridges between Pywal et. al. that I'm building.
 
 Kian Blakey for [Pibble](https://github.com/kianblakley/pibble) which the view mode Depth is heavily based on.
-
-## Void Linux (community port)
-
-Native x86_64 glibc XBPS packaging, manual/session-local operation without systemd,
-and validation limitations are documented in [packaging/void](packaging/void/README.md).
-This community port is not an official Skwd release or a Void repository package.
