@@ -78,7 +78,7 @@ So what about that performance claim? Don't take my word for it, I come with cha
 - Has four completely different GPU-rendered pickers: Slices, Geometric, Wall and Sandy. Because why not?
 - Has out of the box colour theming for popular applications including KDE Plasma, but can easily be extended with Matugen scripts.
 - Starts in about 150 ms, stops rendering when idle and exits completely when closed meaning no resources required unless you're switching wallpapers.
-- Includes 39 (I counted them myself!) wallpaper transitions, from normal fades to turning every pixel into sand and firing it through a Möbius strip.
+- Includes 44 (I counted them myself!) wallpaper transitions, from normal fades to turning every pixel into sand and firing it through a Möbius strip. The Studio family includes photo cutouts, spinning slats, crop relay, arcade and paper heart transitions, with preset or custom timing.
 - Snapchat filters! ...I mean, quick Photoshop effects that you might want to apply and create new wallpapers from. You can stack several of them on top of each other too.
 - Lets you describe the wallpaper you want using local visual search.
 - Filters enormous libraries by type, Shape, resolution, folder, colour, tags, favourites, metadata and current weather (I'll let you decide how to use the last one).
