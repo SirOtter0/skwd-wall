@@ -1,0 +1,3 @@
+/packaging/void/compliance-beta27_2/** -text whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+/README-UPSTREAM.md -text whitespace=-blank-at-eol,-blank-at-eof
+/security/void-beta27/patches/*.patch -text whitespace=-blank-at-eol,-blank-at-eof

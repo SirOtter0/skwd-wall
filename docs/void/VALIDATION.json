@@ -1,0 +1,15 @@
+{
+  "scope": "Publication-only portable tests; no Rust/native rebuild or graphical execution",
+  "packaging_tests_passed": 18,
+  "preserved_notice_files_verified": 1889,
+  "existing_AB_archive_hashes_verified": 8,
+  "candidate_revision": "1.0.0beta27_3",
+  "FFmpeg": "9.0.2",
+  "application_source_modified": false,
+  "experimental_Noctalia_paths_in_publication": false,
+  "host_packages_or_configs_changed": false,
+  "Skwd_processes_stopped_or_restarted": false,
+  "binary_release_authorized": false,
+  "complete_new_source_delivery_pending": true,
+  "full_current_RustSec_audit_pending": true
+}

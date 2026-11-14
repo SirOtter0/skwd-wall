@@ -1,0 +1,5 @@
+This community package preserves the original project MIT license and third-party rights.
+DEPENDENCIES.json distinguishes the conservative linked runtime closure from build-only/proc-macro tools.
+Per-crate and nested native license/copyright/NOTICE files are retained without relicensing.
+See SOURCE-OFFER.txt for the exact corresponding source; see ASSETS.md where fonts/icons are embedded.
+Deck scanner uses the private FFmpeg supplied by Paper; its LGPL/JPEG notices are in /usr/share/licenses/skwd-paper/compliance/.

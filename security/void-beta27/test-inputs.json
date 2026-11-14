@@ -1,0 +1,21 @@
+{
+  "steamworks": {
+    "url": "https://github.com/liixini/skwd-wall/releases/download/v1.0.0-beta.27/skwd-deck-steamworks-x86_64-1.0.0-beta.27.tar.xz",
+    "archive_bytes": 5725900,
+    "sha256": "5411a52f50f3b2000141fb1919a5f96e68d6005131800a00cfd850e5cac5f801",
+    "runtime_sha256": "ec4797f76a206eb0af627af0f0788eb5a2eabf5dee38ee0a6affbaa44a645f4e",
+    "scope": "workspace tests only; not part of the four XBPS candidates"
+  },
+  "ffmpeg_reference": {
+    "version": "9.0.1",
+    "source_sha256": "cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635",
+    "scope": "isolated static test-only CLI; not installed or packaged",
+    "binary_sha256": "2fbffaf2eb61a39e70a2104a2976055b849be63b7cacb73fdbcfaedab68eebd6"
+  },
+  "dxc": {
+    "url": "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/linux_dxc_2025_07_14.x86_64.tar.gz",
+    "archive_bytes": 12648060,
+    "sha256": "f2213da1fc99dc8778c8823078e16ba97c7f80f86a1d4520ab1adf4b462bc48c",
+    "scope": "exact Paper CI test compiler; not installed or included in XBPS"
+  }
+}

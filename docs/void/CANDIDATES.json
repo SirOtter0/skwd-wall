@@ -1,0 +1,74 @@
+{
+  "status": "Historical unsigned build candidates; not an authorized binary release",
+  "source_recipe_base": "a78dad4",
+  "packages": [
+    {
+      "component": "deck",
+      "file": "skwd-deck-local-1.0.0beta27_3.x86_64.xbps",
+      "sha256": "dab525705578fc5755505873e4e04b64c677c4e71a4899a4a2954385c75281af",
+      "bytes": 44832439,
+      "version": "1.0.0beta27_3",
+      "dependencies": [
+        "glibc>=2.41_1",
+        "libgcc>=14.2.1+20250405_4",
+        "skwd-paper-local-1.0.0beta27_3"
+      ],
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0, 0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND ISC, Apache-2.0 OR ISC OR MIT, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CC0-1.0, CDLA-Permissive-2.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, MPL-2.0, Unicode-3.0, Unlicense OR MIT, Unlicense/MIT, WTFPL, Zlib, Zlib OR Apache-2.0 OR MIT"
+    },
+    {
+      "component": "lens",
+      "file": "skwd-lens-local-1.0.0beta27_3.x86_64.xbps",
+      "sha256": "24653f0f395ad3cfa596767cf6791bc320e2fee31a6008da9216ffe46e441647",
+      "bytes": 2162515,
+      "version": "1.0.0beta27_3",
+      "dependencies": [
+        "glibc>=2.41_1",
+        "libgcc>=14.2.1+20250405_4"
+      ],
+      "license": "0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 OR BSL-1.0, Apache-2.0 OR MIT, Apache-2.0 OR MIT OR Zlib, Apache-2.0/MIT, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause OR Apache-2.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, Unlicense OR MIT, Zlib OR Apache-2.0 OR MIT"
+    },
+    {
+      "component": "paper",
+      "file": "skwd-paper-local-1.0.0beta27_3.x86_64.xbps",
+      "sha256": "48435378c6813fb70abc5d4fe6d03bc7f61f5fccc31ab5d6d62dc6b0ff041987",
+      "bytes": 31116759,
+      "version": "1.0.0beta27_3",
+      "dependencies": [
+        "alsa-lib>=1.2.16.1_1",
+        "freetype>=2.15.0_1",
+        "glibc>=2.41_1",
+        "libdav1d>=1.5.3_1",
+        "libdrm>=2.4.134_1",
+        "libgcc>=14.2.1+20250405_4",
+        "libglvnd>=1.7.0_1",
+        "libva>=2.24.1_1",
+        "shaderc>=2026.4_2",
+        "vulkan-loader>=1.4.363.0_1",
+        "wayland>=1.26.0_1",
+        "zlib>=1.4_1"
+      ],
+      "license": "0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND ISC, Apache-2.0 OR ISC OR MIT, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CDLA-Permissive-2.0, ISC, LGPL-2.1-or-later, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, Unicode-3.0, Unlicense OR MIT, WTFPL, Zlib, Zlib OR Apache-2.0 OR MIT"
+    },
+    {
+      "component": "wall",
+      "file": "skwd-wall-v2-local-1.0.0beta27_3.x86_64.xbps",
+      "sha256": "b85cbe72ec708e422d4c9ae4182b511f2e7cd79fab1e80ca11b6366997423a57",
+      "bytes": 13117574,
+      "version": "1.0.0beta27_3",
+      "dependencies": [
+        "fontconfig>=2.18.3_1",
+        "freetype>=2.15.0_1",
+        "glibc>=2.41_1",
+        "libgcc>=14.2.1+20250405_4",
+        "libglvnd>=1.7.0_1",
+        "libxkbcommon>=1.13.2_1",
+        "vulkan-loader>=1.4.363.0_1",
+        "wayland>=1.26.0_1",
+        "skwd-paper-local-1.0.0beta27_3",
+        "skwd-deck-local-1.0.0beta27_3"
+      ],
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0, 0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND MIT, Apache-2.0 OR GPL-2.0-only, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CC-BY-3.0, CC-BY-4.0, CC0-1.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, MPL-2.0, OFL-1.1, Unicode-3.0, Unlicense, Unlicense OR MIT, Zlib, Zlib OR Apache-2.0 OR MIT"
+    }
+  ],
+  "distribution_approved": false
+}

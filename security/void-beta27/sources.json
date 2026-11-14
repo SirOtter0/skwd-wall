@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0-beta.27",
+  "original_archive_sha256": "3337c85f91b2e8b61f1df5d31b9797379b8ac83e3824b17c910317826dfdb70a",
+  "commits": {
+    "deck": "4db802ee59c4a63c64d31032df57457d8188adb1",
+    "lens": "16d60523a70a1a2cb2406f6b6a26de583a8d6164",
+    "paper": "37eb0bc1925c969c867c1db099e0d30b3f868822",
+    "wall": "333a16d59cd716b987ab93d9e08f5d952d89285c"
+  },
+  "official_release": true,
+  "archive_url": "https://github.com/liixini/skwd-wall/releases/download/v1.0.0-beta.27/skwd-suite-1.0.0-beta.27.tar.xz",
+  "archive_bytes": 143525588,
+  "release_url": "https://github.com/liixini/skwd-wall/releases/tag/v1.0.0-beta.27",
+  "ffmpeg": {
+    "version": "9.0.2",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+    "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+    "path": "vendor-ffmpeg/ffmpeg-9.0.2.tar.xz"
+  },
+  "source_date_epoch": 1793905368,
+  "patches": [
+    "skwd-paper.patch"
+  ]
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "crate": "iced_exdevtools-0.19.1",
+    "index_url": "https://index.crates.io/ic/ed/iced_exdevtools",
+    "archive_url": "https://static.crates.io/crates/iced_exdevtools/iced_exdevtools-0.19.1.crate",
+    "sha256": "b0d34d1c027d135037c34ece007cbfc5aa5c2be54595d2891589f24abafebf25",
+    "rust_sources_compared": 2,
+    "rust_source_differences": [],
+    "original_vcs": null,
+    "declared_license": "MIT",
+    "source_scope": "Authenticated exact registry artifact and lockfile checksum, no source substitution",
+    "authors": [
+      "Decodertalkers <aakari@tutanota.com>",
+      "Aakash Sen Sharma <aakashsensharma@gmail.com>"
+    ],
+    "publisher_manifest_verified": true,
+    "original_manifest_sha256": "319920ffe0046b930ead2be7b59cf274dfbcd80667fef62e46b704cbd7d1352c",
+    "VCS_revision": "not recorded in original crate; not inferred",
+    "resolution": "Exact registry checksum equals Cargo.lock and all shipped Rust sources match the official crate. Publisher manifest explicitly grants MIT. Retain author attribution plus matching-author/workspace MIT copyright text; no original Git revision claimed."
+  },
+  {
+    "crate": "waycrate_xkbkeycode-0.19.1",
+    "index_url": "https://index.crates.io/wa/yc/waycrate_xkbkeycode",
+    "archive_url": "https://static.crates.io/crates/waycrate_xkbkeycode/waycrate_xkbkeycode-0.19.1.crate",
+    "sha256": "e904c31025b16851793aa2e8eae3c1b4466af8345b45fb7e46ec61b05a4f9086",
+    "rust_sources_compared": 4,
+    "rust_source_differences": [],
+    "original_vcs": null,
+    "declared_license": "MIT",
+    "source_scope": "Authenticated exact registry artifact and lockfile checksum, no source substitution",
+    "authors": [
+      "Decodertalkers <aakari@tutanota.com>",
+      "Aakash Sen Sharma <aakashsensharma@gmail.com>"
+    ],
+    "publisher_manifest_verified": true,
+    "original_manifest_sha256": "f261b09db03905a972609ec976b33b5b3c8e4d5425e9f6b120e5d3ab3381a8fb",
+    "VCS_revision": "not recorded in original crate; not inferred",
+    "resolution": "Exact registry checksum equals Cargo.lock and all shipped Rust sources match the official crate. Publisher manifest explicitly grants MIT. Retain author attribution plus matching-author/workspace MIT copyright text; no original Git revision claimed."
+  }
+]
