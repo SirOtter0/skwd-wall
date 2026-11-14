@@ -1,0 +1,46 @@
+{
+  "approval": false,
+  "changed_font_inputs": [
+    {
+      "component": "wall",
+      "path": "assets/RobotoCondensed-Bold-JP.ttf",
+      "beta26_sha256": "4c39b94ca55c748b4435d0419da1b4a24e1a6b30239c3fda5e4846c4d845b2e2",
+      "beta27_sha256": "1c99a69b20a6a1855d5b6022efe2bfd2ab767a90ac054f0c016badae3348dcae"
+    },
+    {
+      "component": "wall",
+      "path": "assets/RobotoCondensed-Bold-SC.ttf",
+      "beta26_sha256": "8342682c22cb4bedf2d86ab0f9781a189c8348cf1505b9981096237e05527c70",
+      "beta27_sha256": "cedab2b3a286383446a7341f4bc8581fef2e281478e92d4876c2e3758f105cf5"
+    },
+    {
+      "component": "paper",
+      "path": "crates/paper-scene/src/fixtures/fonts/fallback.ttf",
+      "beta26_sha256": null,
+      "beta27_sha256": "e664650e740eb77932a3dbee567d930e5b0dd688f907c3e04e203346cbda60cc"
+    },
+    {
+      "component": "paper",
+      "path": "crates/paper-scene/src/fixtures/fonts/latin.ttf",
+      "beta26_sha256": null,
+      "beta27_sha256": "b9cf07f4920fcee53ede02c5c6153e0a7f6f4edf8e16af5ced0a1480395ea447"
+    },
+    {
+      "component": "paper",
+      "path": "crates/paper-scene/src/fixtures/fonts/mono.ttf",
+      "beta26_sha256": null,
+      "beta27_sha256": "bbe17973aac36a3748d7d984e0631de0091f92465395dda6b0e6970a60dfd97c"
+    },
+    {
+      "component": "paper",
+      "path": "crates/paper-widgets/assets/RobotoCondensed-Bold.ttf",
+      "beta26_sha256": null,
+      "beta27_sha256": "1d4b82063c550d8cb27fa21a8905ce4dfb6f638b420f1857ab05cd4514b00ee0"
+    }
+  ],
+  "nerd_font_sha256": "71db104aa66567d0efe0b98758f9dfc1895573a453fe85fb53d1c38544a55106",
+  "nerd_font_matches_previous_verified_blob": true,
+  "CJK_review": "JP and SC binaries changed; subset script names NotoSansCJK-Bold.ttc but exact input font version must not be invented",
+  "fixture_review": "paper-scene fonts/build.py draws synthetic rectangular glyphs with FontBuilder, no external font import; script reviewed, not executed",
+  "paper_widget_font_matches_wall_base": true
+}

@@ -35,3 +35,8 @@ __pycache__/
 /semver-no-baseline.txt
 
 # analysis tool output
+
+# Void port local build/package outputs (never commit binaries or host evidence)
+/work/
+*.xbps
+*.sig2

@@ -1,0 +1,13 @@
+--- a/packaging/build-ffmpeg-runtime.sh
++++ b/packaging/build-ffmpeg-runtime.sh
+@@ -6,8 +6,8 @@
+     exit 2
+ fi
+ 
+-readonly ffmpeg_version="9.0.1"
+-readonly ffmpeg_sha256="cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635"
++readonly ffmpeg_version="9.0.2"
++readonly ffmpeg_sha256="8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e"
+ readonly ffmpeg_url="https://ffmpeg.org/releases/ffmpeg-${ffmpeg_version}.tar.xz"
+ readonly install_prefix="$1"
+ 

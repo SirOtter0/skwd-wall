@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0beta27_3",
+  "architecture": "x86_64",
+  "private_sonames": [
+    "libavcodec.so.63",
+    "libavformat.so.63",
+    "libavutil.so.61",
+    "libswresample.so.7",
+    "libswscale.so.10"
+  ],
+  "components": {
+    "wall": {
+      "package": "skwd-wall-v2-local",
+      "binaries": {
+        "skwd-wall": "usr/bin/skwd-wall-v2"
+      },
+      "dlopen_dependencies": [
+        "fontconfig",
+        "wayland",
+        "libxkbcommon",
+        "vulkan-loader",
+        "libglvnd"
+      ],
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0, 0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND MIT, Apache-2.0 OR GPL-2.0-only, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CC-BY-3.0, CC-BY-4.0, CC0-1.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, MPL-2.0, OFL-1.1, Unicode-3.0, Unlicense, Unlicense OR MIT, Zlib, Zlib OR Apache-2.0 OR MIT"
+    },
+    "deck": {
+      "package": "skwd-deck-local",
+      "binaries": {
+        "skwd-walld": "usr/bin/skwd-walld",
+        "skwd-wall-scan": "usr/bin/skwd-wall-scan",
+        "skwd-wall-effects": "usr/bin/skwd-wall-effects",
+        "skwd-helm": "usr/bin/skwd-helm",
+        "skwd-wall-draw": "usr/bin/skwd-wall-draw"
+      },
+      "dlopen_dependencies": [],
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0, 0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND ISC, Apache-2.0 OR ISC OR MIT, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CC0-1.0, CDLA-Permissive-2.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, MPL-2.0, Unicode-3.0, Unlicense OR MIT, Unlicense/MIT, WTFPL, Zlib, Zlib OR Apache-2.0 OR MIT"
+    },
+    "lens": {
+      "package": "skwd-lens-local",
+      "binaries": {
+        "skwd-lens": "usr/bin/skwd-lens"
+      },
+      "dlopen_dependencies": [],
+      "license": "0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 OR BSL-1.0, Apache-2.0 OR MIT, Apache-2.0 OR MIT OR Zlib, Apache-2.0/MIT, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause OR Apache-2.0, ISC, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, Unlicense OR MIT, Zlib OR Apache-2.0 OR MIT"
+    },
+    "paper": {
+      "package": "skwd-paper-local",
+      "binaries": {
+        "skwd-paper": "usr/bin/skwd-paper-v2",
+        "skwd-wall-vk": "usr/bin/skwd-wall-vk",
+        "skwd-wall-still": "usr/bin/skwd-wall-still"
+      },
+      "dlopen_dependencies": [
+        "vulkan-loader",
+        "libglvnd"
+      ],
+      "license": "0BSD OR MIT OR Apache-2.0, Apache-2.0, Apache-2.0 AND ISC, Apache-2.0 OR ISC OR MIT, Apache-2.0 OR MIT, Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT, Apache-2.0/MIT, BSD-2-Clause, BSD-2-Clause OR Apache-2.0 OR MIT, BSD-3-Clause, BSD-3-Clause OR Apache-2.0, CDLA-Permissive-2.0, ISC, LGPL-2.1-or-later, MIT, MIT OR Apache-2.0, MIT OR Apache-2.0 OR Zlib, MIT OR Zlib OR Apache-2.0, MIT/Apache-2.0, Unicode-3.0, Unlicense OR MIT, WTFPL, Zlib, Zlib OR Apache-2.0 OR MIT"
+    }
+  }
+}
