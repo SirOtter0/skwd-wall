@@ -25,6 +25,8 @@ pub(crate) fn bar_intent_message(intent: crate::frontend::ui::BarIntent) -> Mess
             BarAction::ShowHidden => Message::ToggleShowHidden,
             BarAction::Download => Message::OpenSourceBrowser,
             BarAction::Playlists => Message::Pl(crate::frontend::playlists::PlMsg::OpenPicker),
+            BarAction::ColourStudio => Message::KeyColourStudio,
+            BarAction::Widgets => Message::OpenWidgets,
             BarAction::Random => Message::ToggleRandomRotate,
             BarAction::TagCloud => Message::OpenTagCloud,
             BarAction::ThemePanel => Message::ToggleThemePanel,
@@ -94,6 +96,9 @@ pub(crate) fn bar_show(
         tagcloud: config.filter_show("tagcloud"),
         download: config.filter_show("download"),
         playlists: config.filter_show("playlists"),
+        colour_studio: config
+            .flag_default_config(skwd_config::keys::filter_bar::SHOW_COLOUR_STUDIO),
+        widgets: config.flag_default_config(skwd_config::keys::filter_bar::SHOW_WIDGETS),
         hidden: (app.library_session.library.catalog().has_hidden()
             || app.library_session.filters.reveal)
             .then_some(app.library_session.filters.reveal),
@@ -386,7 +391,7 @@ pub(super) fn filter_bar_layer(app: &App, vw: f32, vh: f32) -> Element<'_, Messa
         menu_scroll: app.chrome.bar.menu_scroll.x.clamp(0.0, menu_max_scroll),
         theme_swatch: &app.theme.swatch,
         pal: &app.theme.palette,
-        cache: &app.chrome.bar.cache,
+        cache: app.chrome.bar.cache.canvas(),
         scale,
         fade: app.scene.open_fade()
             * app.chrome.filter_bar_fade()

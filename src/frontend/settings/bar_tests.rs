@@ -7,6 +7,8 @@ use crate::frontend::settings::{Parked, place};
 use crate::frontend::ui::calm::sentinel;
 
 const PRESETS: &str = bar::RESOLUTION_PRESETS;
+const HOVERED: Choice = Choice { arg: VISIBILITY_ARG, values: ["always", "hover"] };
+const HIDDEN: Choice = Choice { arg: VISIBILITY_ARG, values: ["always", "hidden"] };
 const ARGS: [&str; 7] = ["val", "end", "buttons", "sorts", "style", "folder", "model"];
 
 fn filled<'a>(
@@ -72,16 +74,16 @@ fn filter_sentence_states() {
         .with_flag(bar::SHOW_DOWNLOAD, false)
         .with_flag("filterBar.show.sort.pop", false)
         .with_flag("filterBar.show.sort.richness", false)
-        .with_flag(keys::general::FILTER_BAR_ALWAYS_VISIBLE, false)
+        .with_text(keys::general::FILTER_BAR_VISIBILITY, "hover")
         .with_text(bar::ORIENTATION, "vertical");
     for (cfg, expected) in [
         (
             FakeSettingsSource::default(),
-            "Shows 14 of 14 buttons and 7 of 7 sorts, laid out horizontally. It stays pinned. Visual style: [0].",
+            "Shows 14 of 16 buttons and 7 of 7 sorts, laid out horizontally. It stays pinned. Visual style: [0].",
         ),
         (
             hidden,
-            "Shows 12 of 14 buttons and 5 of 7 sorts, laid out vertically. It hides until you need it. Visual style: [0].",
+            "Shows 12 of 16 buttons and 5 of 7 sorts, laid out vertically. It shows while the pointer is over it. Visual style: [0].",
         ),
     ] {
         let filter = section(&cfg, FILTER);
@@ -98,25 +100,29 @@ fn filter_body_rows() {
     let [offers, behaves] = &filter.groups[..] else { panic!("two columns") };
     let cells: Vec<_> = offers.rows.iter().map(|row| row.look.cell).collect();
     let mut expected = vec![Cell::Checks];
-    expected.extend([Cell::Joined; 14]);
+    expected.extend([Cell::Joined; 16]);
     expected.push(Cell::Checks);
     expected.extend([Cell::Joined; 7]);
     expected.extend([Cell::Value; 4]);
     assert_eq!(cells, expected);
     assert_eq!(offers.rows[0].title, "Buttons on the bar");
-    assert_eq!(offers.rows[15].title, "Sort options");
+    assert_eq!(offers.rows[17].title, "Sort options");
     assert_eq!(
-        paths(&offers.rows[23..]),
+        paths(&offers.rows[25..]),
         [bar::BUTTON_ORDER, bar::HIDDEN_BUTTONS, bar::SHOW_ARRANGE, bar::SHOW_SWATCH]
     );
-    assert_eq!(offers.rows[25].title, "Arrange button");
-    assert_eq!(offers.rows[26].title, "Colour strip");
-    assert_eq!(offers.rows[25].hint(), "Place it in Arrange");
-    assert_eq!(behaves.rows[3].title, "Tag panel");
-    assert_eq!(behaves.rows[3].control.path(), Some(keys::selector::TAG_CLOUD_WIDTH));
-    assert_eq!(behaves.rows[4].look.cell, Cell::Beside);
+    assert_eq!(offers.rows[27].title, "Arrange button");
+    assert_eq!(offers.rows[28].title, "Colour strip");
+    assert_eq!(offers.rows[27].hint(), "Place it in Arrange");
+    assert_eq!(behaves.rows[4].title, "Tag panel");
+    assert_eq!(behaves.rows[4].control.path(), Some(keys::selector::TAG_CLOUD_WIDTH));
+    assert_eq!(behaves.rows[5].look.cell, Cell::Beside);
     assert_eq!(behaves.rows[0].look.cell, Cell::Buttons(&ORIENTATIONS));
-    assert_eq!(behaves.rows[1].hint(), "Pinned instead of auto-hiding");
+    assert_eq!(behaves.rows[1].look.cell, Cell::Buttons(&VISIBILITIES));
+    assert_eq!(behaves.rows[1].control.path(), Some(keys::general::FILTER_BAR_VISIBILITY));
+    assert_eq!(behaves.rows[1].hint(), "Show the filter bar every time the picker opens.");
+    assert_eq!(behaves.rows[2].control.path(), Some(keys::general::SEARCH_ALWAYS_VISIBLE));
+    assert_eq!(behaves.rows[2].hint(), "Opens with the picker");
     assert_eq!(actions(&behaves.rows), [ActionId::ArrangePicker]);
     assert_eq!(filter.foot.as_deref(), Some("Where the bar sits stays in Layout."));
 }
@@ -126,9 +132,9 @@ fn checks_own_members() {
     let filter = section(&FakeSettingsSource::default(), FILTER);
     let lead = filter.header_rows();
     let members = filter.checks(lead).expect("buttons menu");
-    assert_eq!(members, (lead + 1..=lead + 14).collect::<Vec<_>>());
+    assert_eq!(members, (lead + 1..=lead + 16).collect::<Vec<_>>());
     assert!(members.iter().all(|at| filter.checked_by(*at) == Some(lead) && filter.follows(*at)));
-    assert_eq!(filter.checks(lead + 15).map(|rows| rows.len()), Some(7));
+    assert_eq!(filter.checks(lead + 17).map(|rows| rows.len()), Some(7));
     assert_eq!(filter.checked_by(lead), None);
     assert!(filter.checks(lead + 1).is_none());
 }
@@ -327,7 +333,8 @@ fn head_rows_drawn() {
 fn sentences_keep_slots() {
     let mark = sentinel(0).expect("slot").to_string();
     let says = [
-        (FILTER_SAY, "style", vec![ORIENTED, PINNED]),
+        (FILTER_SAY, "style", vec![ORIENTED, HOVERED]),
+        (FILTER_SAY, "style", vec![ORIENTED, HIDDEN]),
         (START_SAY, "folder", vec![STICKY]),
         (SEARCH_SAY, "model", vec![MODE, VIEWED]),
     ];
@@ -345,7 +352,8 @@ fn sentences_keep_slots() {
 #[test]
 fn selectors_change_text() {
     let says = [
-        (FILTER_SAY, vec![ORIENTED, PINNED]),
+        (FILTER_SAY, vec![ORIENTED, HOVERED]),
+        (FILTER_SAY, vec![ORIENTED, HIDDEN]),
         (START_SAY, vec![STICKY]),
         (SEARCH_SAY, vec![MODE, VIEWED]),
         (SEARCH_OFF, vec![MODE]),
@@ -448,8 +456,8 @@ fn off_keeps_rows() {
         .with_flag(bar::SHOW_SWATCH, false);
     let filter = section(&cfg, FILTER);
     let [offers, behaves] = &filter.groups[..] else { panic!("two columns") };
-    assert_eq!(offers.rows[25].control.switched_on(), Some(false));
-    assert_eq!(offers.rows[26].control.switched_on(), Some(false));
+    assert_eq!(offers.rows[27].control.switched_on(), Some(false));
+    assert_eq!(offers.rows[28].control.switched_on(), Some(false));
     assert_eq!(actions(&behaves.rows), [ActionId::ArrangePicker]);
     assert_eq!(filter.say.text, section(&FakeSettingsSource::default(), FILTER).say.text);
 }
@@ -466,4 +474,37 @@ fn floating_found_themselves() {
         let row = filter.rows().position(|row| row.control.path() == Some(path)).expect("row");
         assert!(found.iter().any(|hit| hit.tab == place::BAR && hit.row == row), "{query}");
     }
+}
+
+fn visibility_hint(cfg: &FakeSettingsSource) -> String {
+    let filter = section(cfg, FILTER);
+    let row = filter.groups[1]
+        .rows
+        .iter()
+        .find(|row| row.control.path() == Some(keys::general::FILTER_BAR_VISIBILITY));
+    shown(row.expect("visibility row").hint())
+}
+
+#[test]
+fn hidden_hint_names_binding() {
+    use crate::domain::input::{InputAction, InputMap};
+    let hidden = |raw: &str| {
+        let map = InputMap::from_bindings([(InputAction::FilterBar, raw.to_owned())]);
+        let cfg = FakeSettingsSource::default()
+            .with_text(keys::general::FILTER_BAR_VISIBILITY, "hidden")
+            .with_bindings(map);
+        visibility_hint(&cfg)
+    };
+    assert_eq!(hidden("x"), "Hide the filter bar. Use the keybind X to restore access.");
+    assert!(hidden("ctrl+b").contains("Ctrl+B"));
+    assert_eq!(
+        hidden("none"),
+        "Hide the filter bar. It has no keybind yet, so bind one in Keybinds to restore access."
+    );
+    let hover =
+        FakeSettingsSource::default().with_text(keys::general::FILTER_BAR_VISIBILITY, "hover");
+    assert_eq!(
+        visibility_hint(&hover),
+        "Show the filter bar when the pointer reaches it. It hides again when the pointer leaves."
+    );
 }

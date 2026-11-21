@@ -16,6 +16,8 @@ const CLOUD_INNER_PAD: f32 = 36.0;
 const CLOUD_INNER_MIN: f32 = 120.0;
 const CLOUD_CARD_GAP: f32 = 14.0;
 const CLOUD_BOTTOM_MARGIN: f32 = 16.0;
+const CLOUD_WIDTH_GROWTH: f32 = 1.15;
+const CLOUD_AUTO_WIDTH_MAX: f32 = 920.0;
 
 pub(crate) fn tag_intent_message(intent: crate::frontend::tagcloud::TagIntent) -> Message {
     match intent {
@@ -33,7 +35,9 @@ pub(crate) fn cloud_fit_width(
 ) -> f32 {
     let w = match (override_w, content_w) {
         (Some(w), _) => w,
-        (None, Some(cw)) => cw.clamp(cfg_w, (cfg_w * 1.15).min(920.0)),
+        (None, Some(cw)) => {
+            cw.clamp(cfg_w, (cfg_w * CLOUD_WIDTH_GROWTH).min(CLOUD_AUTO_WIDTH_MAX).max(cfg_w))
+        }
         (None, None) => cfg_w,
     };
     w.min(vw - 40.0).max(200.0)
@@ -396,7 +400,11 @@ pub(super) fn tag_cloud_layer(app: &App, vh: f32) -> Element<'_, Message> {
         filtered_count: app.library_session.visible_count,
         sort_az: app.tags.sort_az,
         matching_tags_open: app.tags.matching_tags_open,
-        entrance: if app.panels.arrange.is_some() { 1.0 } else { app.tags.cloud_entrance.x },
+        entrance: if app.panels.arrange.is_some() {
+            1.0
+        } else {
+            app.tags.cloud_entrance.x * app.scene.open_fade()
+        },
         scroll: app.tags.cloud_scroll.x,
         scroll_target: app.tags.cloud_scroll.target,
         width: rect.width,

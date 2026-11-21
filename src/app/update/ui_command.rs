@@ -17,6 +17,22 @@ const SETTINGS_FIELD: &str = "settings";
 const DRAWING_FIELD: &str = "drawing";
 const WEATHER_REVIEW_FIELD: &str = "weather_review";
 const BROWSER_ASSET_ACTION: &str = "asset";
+const LIBRARY_FIELD: &str = "library";
+
+#[derive(serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+enum LibraryUiStatus {
+    Loading,
+    Ready,
+    Failed,
+}
+
+#[derive(serde::Serialize)]
+struct LibraryUiState<'a> {
+    state: LibraryUiStatus,
+    error: Option<&'a str>,
+    count: usize,
+}
 
 #[derive(serde::Serialize)]
 struct BrowserPreviewUiState<'a> {
@@ -165,6 +181,7 @@ const SETTINGS_OPEN_FIELD: &str = "open_section";
 const SETTINGS_OPEN_KEY_FIELD: &str = "open_section_key";
 const SETTINGS_KEYS_FIELD: &str = "section_keys";
 const SETTINGS_TRANSITION_FIELD: &str = "transitioning";
+const VISIBLE_WRAPPED_FIELD: &str = "wrapped";
 const SETTINGS_STUDIO_FIELD: &str = "layout_studio";
 
 pub(crate) fn ui_state_json(app: &App) -> String {
@@ -313,6 +330,18 @@ pub(crate) fn ui_state_json(app: &App) -> String {
         (LAYOUT_OUTPUT_FIELD): app.config.layout_output(),
         "mode": mode,
         "count": app.library_session.filtered.len(),
+        (LIBRARY_FIELD): LibraryUiState {
+            state: match &app.daemon.library_load {
+                LibraryLoad::Loading => LibraryUiStatus::Loading,
+                LibraryLoad::Ready => LibraryUiStatus::Ready,
+                LibraryLoad::Failed(_) => LibraryUiStatus::Failed,
+            },
+            error: match &app.daemon.library_load {
+                LibraryLoad::Failed(error) => Some(error.as_str()),
+                _ => None,
+            },
+            count: app.library_session.library.catalog().items.len(),
+        },
         "current": app.scene.current,
         "selection": selection,
         "camera": { "x": app.scene.camera_pos(), "target": app.scene.camera_target() },
@@ -332,7 +361,7 @@ pub(crate) fn ui_state_json(app: &App) -> String {
                 "y": app.scene.wall_composition_center().1,
             },
         },
-        "visible": { "lo": vis_lo, "hi": vis_hi },
+        "visible": { "lo": vis_lo, "hi": vis_hi, (VISIBLE_WRAPPED_FIELD): vis_lo > vis_hi },
         "geometry": {
             "wall_layout": app.scene.gp.layout.as_key(),
             "hex_curve": app.scene.hp.curve.as_key(),
@@ -514,11 +543,11 @@ pub(super) fn run_ui_command(app: &mut App, cmd: &str) -> Task<Message> {
     let arg = cmd[verb.len()..].trim().to_string();
     match verb {
         WIDGETS_VERB => {
-            let shown = crate::app::warm::unstash(app);
+            let shown = crate::app::warm::reappear(app);
             Task::batch([shown, super::strand::open(app)])
         }
         "toggle" => crate::app::warm::toggle(app),
-        "show" => crate::app::warm::unstash(app),
+        "show" => crate::app::warm::reappear(app),
         "hide" => crate::app::warm::exit_picker(app),
         "stash" => crate::app::warm::toggle_stash(app),
         "demo" => match arg.as_str() {
@@ -677,12 +706,11 @@ pub(super) fn run_ui_command(app: &mut App, cmd: &str) -> Task<Message> {
         "reveal" => super::update_inner(app, Message::KeyReveal),
         "bar" => {
             match arg.as_str() {
-                "show" => app.chrome.filter_bar_visible = true,
-                "hide" => app.chrome.filter_bar_visible = false,
-                "toggle" => app.chrome.filter_bar_visible = !app.chrome.filter_bar_visible,
+                "show" => app.chrome.set_filter_bar(true),
+                "hide" => app.chrome.set_filter_bar(false),
+                "toggle" => app.chrome.set_filter_bar(!app.chrome.filter_bar_shown()),
                 other => log::warn!("ui command: unknown bar action '{other}'"),
             }
-            app.chrome.bar.cache.clear();
             app.retick();
             Task::none()
         }
@@ -713,9 +741,9 @@ pub(super) fn run_ui_command(app: &mut App, cmd: &str) -> Task<Message> {
             let resolution = if matches!(arg.as_str(), "any" | "") { String::new() } else { arg };
             super::update_inner(app, Message::SetResolution(resolution))
         }
-        "open" => Task::batch([crate::app::warm::unstash(app), ui_open(app, &arg)]),
+        "open" => Task::batch([crate::app::warm::reappear(app), ui_open(app, &arg)]),
         crate::infrastructure::runtime::PROFILE_COMMAND => {
-            let task = crate::app::warm::unstash(app);
+            let task = crate::app::warm::reappear(app);
             app.show_profile((!arg.is_empty()).then_some(arg));
             task
         }
@@ -2102,8 +2130,7 @@ fn demo_begin(app: &mut App) -> Task<Message> {
     app.tags.semantic.search.clear();
     app.library_session.filters = crate::domain::library::filter::Filters::default();
     app.refilter();
-    app.chrome.filter_bar_visible = true;
-    app.chrome.bar.cache.clear();
+    app.chrome.set_filter_bar(true);
     let count = app.library_session.filtered.len();
     app.scene.reset_to_index(app.demo_showcase_index(count), count);
     app.retick();
@@ -2156,8 +2183,7 @@ fn demo_end(app: &mut App) -> Task<Message> {
     app.theme.fade_to = session.palette;
     app.theme.fade_t =
         app.motion_profile().tween(1.0, crate::frontend::animation::MotionTier::Standard);
-    app.chrome.filter_bar_visible = session.filter_bar_visible;
-    app.chrome.bar.cache.clear();
+    app.chrome.set_filter_bar(session.filter_bar_visible);
     if !session.selection_key.is_empty() {
         let _ = select_key(app, &session.selection_key);
     }

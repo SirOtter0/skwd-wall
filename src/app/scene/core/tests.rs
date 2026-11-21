@@ -279,6 +279,8 @@ fn empty_cell_wave() {
 #[test]
 fn open_fade_cycle() {
     let mut scene = test_scene(Mode::Grid);
+    scene.begin_open_fade();
+    scene.start_pending_entrance();
     assert!(!scene.motion.entrance.settled());
     assert!(scene.open_fade() < 1.0);
     let mid = scene.motion.entrance.x;
@@ -1382,17 +1384,17 @@ fn wall_camera_slow_tier() {
 fn slice_camera_anchors_selection() {
     let mut scene = test_scene(Mode::Sandy);
     scene.set_mode(Mode::Slices);
-    scene.position_slice_camera(120_000.0);
+    scene.position_slice_camera(120_000.0, 1000.0);
     assert_eq!(scene.camera_pos(), 120_000.0);
     assert_eq!(scene.camera_target(), 120_000.0);
 
     scene.sp_target.spacing = 52.0;
-    scene.position_slice_camera(180_000.0);
+    scene.position_slice_camera(180_000.0, 1000.0);
     assert_eq!(scene.camera_pos(), 180_000.0);
     assert_eq!(scene.camera_target(), 180_000.0);
 
     scene.sp = scene.sp_target;
-    scene.position_slice_camera(180_200.0);
+    scene.position_slice_camera(180_200.0, 1000.0);
     assert_eq!(scene.camera_pos(), 180_000.0);
     assert_eq!(scene.camera_target(), 180_200.0);
 }
@@ -1401,17 +1403,17 @@ fn slice_camera_anchors_selection() {
 fn hex_camera_anchors_selection() {
     let mut scene = test_scene(Mode::Slices);
     scene.set_mode(Mode::Hex);
-    scene.position_hex_camera(90_000.0);
+    scene.position_hex_camera(90_000.0, 1000.0);
     assert_eq!(scene.camera_pos(), 90_000.0);
     assert_eq!(scene.camera_target(), 90_000.0);
 
     scene.hp_target.r = 118.0;
-    scene.position_hex_camera(140_000.0);
+    scene.position_hex_camera(140_000.0, 1000.0);
     assert_eq!(scene.camera_pos(), 140_000.0);
     assert_eq!(scene.camera_target(), 140_000.0);
 
     scene.hp = scene.hp_target;
-    scene.position_hex_camera(140_200.0);
+    scene.position_hex_camera(140_200.0, 1000.0);
     assert_eq!(scene.camera_pos(), 140_000.0);
     assert_eq!(scene.camera_target(), 140_200.0);
 }
@@ -1560,7 +1562,8 @@ fn framed_hits_match_cards() {
         let snap = rendered_scene_with_setup(mode, base_sp(), base_gp(), 20, None, 0.0, |scene| {
             scene.set_picker_frame(Some([0.1, 0.2, 0.6, 0.5]));
         });
-        assert_eq!(snap.clip, Some([120.0, 140.0, 840.0, 490.0]));
+        let clipped = mode == Mode::Grid;
+        assert_eq!(snap.clip, clipped.then_some([120.0, 140.0, 840.0, 490.0]), "{mode:?}");
         assert!(!snap.hits.is_empty(), "{mode:?}");
         for hit in &snap.hits {
             assert!(hit.contains(hit.cx, hit.cy), "{mode:?}");
@@ -1571,6 +1574,126 @@ fn framed_hits_match_cards() {
             top.index
         );
     }
+}
+
+const FRAME: [f32; 4] = [0.1, 0.2, 0.6, 0.5];
+const FRAME_CENTRE: (f32, f32) = (480.0, 315.0);
+
+fn sizes(snap: &RenderSnapshot) -> Vec<(usize, f32, f32)> {
+    let mut sizes: Vec<_> = snap.hits.iter().map(|hit| (hit.index, hit.hw, hit.hh)).collect();
+    sizes.sort_by_key(|size| size.0);
+    sizes
+}
+
+#[test]
+fn frame_keeps_card_sizes() {
+    for mode in [Mode::Slices, Mode::Depth, Mode::Hex, Mode::Collection] {
+        let render = |frame| {
+            rendered_scene_with_setup(mode, base_sp(), base_gp(), 20, None, 0.0, |scene| {
+                scene.set_picker_frame(frame);
+            })
+        };
+        let free = render(None);
+        let framed = render(Some(FRAME));
+        assert_eq!(framed.clip, None, "{mode:?}");
+        assert_eq!(sizes(&framed), sizes(&free), "{mode:?}");
+    }
+}
+
+#[test]
+fn fullscreen_modes_ignore_frame() {
+    for mode in [Mode::Sandy, Mode::Hand] {
+        let render = |frame| {
+            rendered_scene_with_setup(mode, base_sp(), base_gp(), 20, None, 0.0, |scene| {
+                scene.set_picker_frame(frame);
+            })
+        };
+        let free = render(None);
+        let framed = render(Some(FRAME));
+        assert_eq!(framed.clip, None, "{mode:?}");
+        let place = |snap: &RenderSnapshot| {
+            snap.hits
+                .iter()
+                .map(|hit| (hit.index, hit.cx, hit.cy, hit.hw, hit.hh))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(place(&framed), place(&free), "{mode:?}");
+    }
+}
+
+#[test]
+fn offcentre_frame_on_screen() {
+    for frame in [[0.0, 0.0, 0.1, 0.1], [0.9, 0.85, 0.1, 0.15]] {
+        let mut scene = hand_scene();
+        scene.viewport = (1200.0, 700.0);
+        scene.set_mode(Mode::Slices);
+        scene.set_picker_frame(Some(frame));
+        let mut fixture = hand_fixture(20);
+        scene.reset_to_index(5, 20);
+        hand_frames(&mut scene, &mut fixture, &mut Instant::now(), 2);
+        let found = scene.configured_frame_bounds().unwrap();
+        assert!(found.x >= 0.0 && found.y >= 0.0, "{frame:?} {found:?}");
+        assert!(found.x + found.width <= 1200.0, "{frame:?} {found:?}");
+        assert!(found.y + found.height <= 700.0, "{frame:?} {found:?}");
+        let hero = scene.render.hits.iter().find(|hit| hit.index == 5).unwrap();
+        assert!((hero.cx - found.center_x()).abs() < 0.01, "{frame:?}");
+        assert!((hero.cy - found.center_y()).abs() < 0.01, "{frame:?}");
+    }
+}
+
+#[test]
+fn framed_strip_holds_still() {
+    for at in [0, 7, 19] {
+        let snap =
+            rendered_scene_with_setup(Mode::Slices, base_sp(), base_gp(), 20, None, 0.0, |scene| {
+                scene.set_picker_frame(Some(FRAME));
+                scene.reset_to_index(at, 20);
+            });
+        let hero = snap.hits.iter().find(|hit| hit.index == at).unwrap();
+        assert!((hero.cx - FRAME_CENTRE.0).abs() < 0.01, "{at}: {}", hero.cx);
+        assert!((hero.cy - FRAME_CENTRE.1).abs() < 0.01, "{at}: {}", hero.cy);
+        assert_eq!(hero.hh, base_sp().slice_h * 0.5);
+    }
+}
+
+#[test]
+fn framed_box_is_strip() {
+    let mut scene = hand_scene();
+    scene.viewport = (1200.0, 700.0);
+    scene.set_mode(Mode::Slices);
+    scene.set_picker_frame(Some(FRAME));
+    let mut fixture = hand_fixture(20);
+    let mut now = Instant::now();
+    let mut boxes = Vec::new();
+    for at in [0, 9] {
+        scene.reset_to_index(at, 20);
+        hand_frames(&mut scene, &mut fixture, &mut now, 2);
+        boxes.push(scene.configured_frame_bounds().unwrap());
+    }
+    let sp = scene.sp;
+    let strip = sp.layout_width(sp.expanded_w) + (sp.visible_count - 1) as f32 * sp.slice_stride();
+    for found in boxes {
+        assert!((found.width - strip).abs() < 0.01, "{found:?}");
+        assert_eq!(found.height, sp.slice_h);
+        assert!((found.center_x() - FRAME_CENTRE.0).abs() < 0.01);
+        assert!((found.center_y() - FRAME_CENTRE.1).abs() < 0.01);
+    }
+}
+
+#[test]
+fn framed_seam_drawn() {
+    let mut scene = hand_scene();
+    scene.viewport = (1200.0, 700.0);
+    scene.set_mode(Mode::Slices);
+    scene.loop_around = true;
+    scene.set_picker_frame(Some(FRAME));
+    let mut fixture = hand_fixture(40);
+    scene.reset_to_index(0, 40);
+    hand_frames(&mut scene, &mut fixture, &mut Instant::now(), 1);
+    let hits = drawn(&scene);
+    assert!(hits.contains(&39) && hits.contains(&1), "{hits:?}");
+    let tail = scene.render.hits.iter().find(|hit| hit.index == 39).unwrap();
+    assert!(tail.cx < FRAME_CENTRE.0);
 }
 
 #[test]
@@ -1752,14 +1875,11 @@ fn framed_grid_navigation() {
 
 #[test]
 fn framed_pointer_modes() {
-    let bounds = iced::Rectangle { x: 0.0, y: 0.0, width: 1000.0, height: 600.0 };
     let mut hand = test_scene(Mode::Hand);
     hand.viewport = (1000.0, 600.0);
     hand.set_picker_frame(Some([0.2, 0.2, 0.6, 0.6]));
-    hand.natural_frame = Some(bounds);
-    let place = hand.picker_placement().unwrap();
-    let (x, y) = place.point(750.0, 150.0);
-    hand.hand_pointer(x, y, None);
+    hand.natural_frame = Some(hand.screen_frame());
+    hand.hand_pointer(750.0, 150.0, None);
     let (tx, ty) = crate::frontend::scene::hand::tilt_target(
         750.0,
         150.0,
@@ -1769,24 +1889,19 @@ fn framed_pointer_modes() {
     );
     assert!((hand.hand.rig_x.target - tx).abs() < 0.01);
     assert!((hand.hand.rig_y.target - ty).abs() < 0.01);
-    let (start_x, start_y) = place.point(500.0, 300.0);
-    let (end_x, end_y) = place.point(600.0, 300.0);
-    hand.hand_drag_start(start_x, start_y);
-    hand.hand_pointer(end_x, end_y, None);
-    let (drag_x, drag_y) = hand.hand.drag.unwrap();
-    assert!((drag_x - 600.0).abs() < 0.01 && (drag_y - 300.0).abs() < 0.01);
+    hand.hand_drag_start(500.0, 300.0);
+    hand.hand_pointer(600.0, 300.0, None);
+    assert_eq!(hand.hand.drag, Some((600.0, 300.0)));
 
     let mut sandy = test_scene(Mode::Sandy);
     sandy.viewport = (1000.0, 600.0);
     sandy.set_picker_frame(Some([0.2, 0.2, 0.6, 0.6]));
-    sandy.natural_frame = Some(bounds);
+    sandy.natural_frame = Some(sandy.screen_frame());
     let y = crate::frontend::scene::sandy::strip_bottom(600.0) - 10.0;
-    let (edge_x, edge_y) = sandy.picker_placement().unwrap().point(10.0, y);
-    sandy.sandy_pointer(edge_x, edge_y, None, 20);
+    sandy.sandy_pointer(10.0, y, None, 20);
     assert!(sandy.sandy.edge_pan < 0.0);
-    sandy.sandy_pointer(100.0, edge_y, None, 20);
+    sandy.sandy_pointer(500.0, y, None, 20);
     assert_eq!(sandy.sandy.edge_pan, 0.0);
-    assert!(!sandy.sandy.cam_free);
 }
 
 #[test]
@@ -3296,7 +3411,7 @@ fn depth_restored_selection_centers_and_flips_inline() {
     let mut scene = test_scene(Mode::Depth);
     scene.restore_selection(42, 100, None);
     assert!(scene.layout_camera_anchor);
-    scene.position_slice_camera(scene.current as f32);
+    scene.position_slice_camera(scene.current as f32, 1000.0);
     assert_eq!(scene.camera_pos(), 42.0);
     scene.toggle_flip(42);
     assert!(scene.flip_open());
@@ -3365,7 +3480,7 @@ fn depth_scroll_parallax_reaches_visual_completion_and_idles() {
     scene.motion.needs_frame = false;
     assert!(!scene.is_animating());
     scene.set_current(5, 20);
-    scene.position_slice_camera(5.0);
+    scene.position_slice_camera(5.0, 1000.0);
     scene.motion.needs_frame = false;
     assert!(scene.is_animating());
     rebuild_collection_test(&mut scene, 20, 180);
@@ -4044,4 +4159,257 @@ fn flip_reverses_smoothly() {
         }
         assert!((frame_ms(frames) - MS * turned).abs() <= frame_ms(1), "{frames} frames");
     });
+}
+
+const LONG_JUMP_WALLS: usize = 3178;
+const LAST_WALL: usize = LONG_JUMP_WALLS - 1;
+const JUMP_MODES: [Mode; 6] =
+    [Mode::Slices, Mode::Depth, Mode::Hex, Mode::Grid, Mode::Sandy, Mode::Collection];
+
+type Fixture = (Catalog, Vec<u32>, UploadQueue, DecodePool, Palette, Option<AtlasMap>);
+
+fn settled_scene(
+    mode: Mode,
+    looped: bool,
+    count: usize,
+    at: usize,
+) -> (SceneCore, Fixture, Instant) {
+    let mut scene = hand_scene();
+    scene.set_mode(mode);
+    scene.kb_nav = true;
+    scene.loop_around = looped;
+    let mut fixture = hand_fixture(count);
+    let mut now = Instant::now();
+    scene.reset_to_index(at, count);
+    hand_frames(&mut scene, &mut fixture, &mut now, 120);
+    (scene, fixture, now)
+}
+
+fn shown(scene: &SceneCore, count: usize) -> Vec<usize> {
+    let (lo, hi) = scene.visible_range();
+    if lo <= hi { (lo..=hi).collect() } else { (lo..count).chain(0..=hi).collect() }
+}
+
+struct Jump {
+    scene: SceneCore,
+    seen: std::collections::HashSet<usize>,
+    peak: f32,
+    net: f32,
+}
+
+fn jumped_scene(mode: Mode, looped: bool, from: usize, to: usize) -> Jump {
+    let (mut scene, mut fixture, mut now) = settled_scene(mode, looped, LONG_JUMP_WALLS, from);
+    scene.set_current(to, LONG_JUMP_WALLS);
+    let mut seen = std::collections::HashSet::new();
+    let (mut last, mut net, mut peak) = (scene.camera_pos(), 0.0_f32, 0.0_f32);
+    for _ in 0..240 {
+        hand_frames(&mut scene, &mut fixture, &mut now, 1);
+        let mut delta = scene.camera_pos() - last;
+        if let Some(period) = scene.period {
+            delta -= (delta / period).round() * period;
+        }
+        last = scene.camera_pos();
+        net += delta;
+        peak = peak.max(net.abs());
+        seen.extend(shown(&scene, LONG_JUMP_WALLS));
+    }
+    Jump { scene, seen, peak, net }
+}
+
+const STEP_GAPS: [usize; 8] = [1, 3, 2, 1, 4, 2, 1, 3];
+
+#[test]
+fn held_steps_glide() {
+    let (mut scene, mut fixture, mut now) = settled_scene(Mode::Slices, true, LONG_JUMP_WALLS, 10);
+    scene.sp.wobble = true;
+    assert!(scene.connected());
+    for (step, gap) in STEP_GAPS.into_iter().enumerate() {
+        scene.set_current(scene.current + 1, LONG_JUMP_WALLS);
+        hand_frames(&mut scene, &mut fixture, &mut now, gap);
+        assert_ne!(scene.camera_pos(), scene.camera_target(), "step {step}");
+    }
+}
+
+#[test]
+fn long_jump_no_sweep() {
+    for mode in JUMP_MODES {
+        for (from, to) in [(0, LAST_WALL), (LAST_WALL, 0)] {
+            let jump = jumped_scene(mode, false, from, to);
+            let (lo, hi) = jump.scene.visible_range();
+            assert!((lo..=hi).contains(&to), "{mode:?} lands on {to}");
+            assert!(jump.seen.len() <= 3 * (hi - lo + 1), "{mode:?} {from}->{to} swept");
+        }
+    }
+}
+
+#[test]
+fn seam_is_one_step() {
+    for (mode, next) in [
+        (Mode::Slices, 1),
+        (Mode::Depth, 1),
+        (Mode::Hex, 3),
+        (Mode::Grid, 0),
+        (Mode::Sandy, 1),
+        (Mode::Collection, 1),
+    ] {
+        let normal = jumped_scene(mode, true, 0, next);
+        let sp = normal.scene.sp;
+        let one = match mode {
+            Mode::Grid => normal.scene.effective_grid_params().cell_h(),
+            Mode::Slices => sp.layout_width(sp.expanded_w) + sp.spacing,
+            _ => normal.peak,
+        };
+        assert!(one > 0.0, "{mode:?} step moves");
+        for (from, to) in [(0, LAST_WALL), (LAST_WALL, 0)] {
+            let jump = jumped_scene(mode, true, from, to);
+            assert!(jump.scene.connected(), "{mode:?} connected");
+            assert!(shown(&jump.scene, LONG_JUMP_WALLS).contains(&to), "{mode:?} lands on {to}");
+            assert!(jump.peak <= one * 1.5, "{mode:?} {from}->{to} moved {}", jump.peak);
+            assert!(!jump.seen.contains(&(LONG_JUMP_WALLS / 2)), "{mode:?} crossed");
+        }
+    }
+}
+
+#[test]
+fn cyclic_jump_shortest() {
+    for mode in JUMP_MODES {
+        let jump = jumped_scene(mode, true, 8, LAST_WALL - 8);
+        assert!(shown(&jump.scene, LONG_JUMP_WALLS).contains(&(LAST_WALL - 8)), "{mode:?} lands");
+        assert!(jump.net < 0.0, "{mode:?} took the long way");
+    }
+}
+
+fn drawn(scene: &SceneCore) -> Vec<usize> {
+    scene.render.hits.iter().map(|hit| hit.index).collect()
+}
+
+#[test]
+fn seam_neighbours_drawn() {
+    for mode in [Mode::Slices, Mode::Depth, Mode::Hex, Mode::Sandy, Mode::Collection] {
+        let (scene, fixture, _) = settled_scene(mode, true, LONG_JUMP_WALLS, 0);
+        let hits = drawn(&scene);
+        assert!(hits.contains(&LAST_WALL) && hits.contains(&1), "{mode:?} drew {hits:?}");
+        let atlas = fixture.5.as_ref().unwrap();
+        assert!(atlas.far.is_known(LAST_WALL), "{mode:?} requests seam");
+        let (lo, hi) = scene.visible_range();
+        assert!(lo > hi, "{mode:?} range wraps");
+        for ring in [lo - 1, hi + 1] {
+            assert!(atlas.far.is_known(ring), "{mode:?} prefetches {ring}");
+        }
+    }
+}
+
+#[test]
+fn grid_scroll_wraps() {
+    let (mut scene, mut fixture, mut now) = settled_scene(Mode::Grid, true, LONG_JUMP_WALLS, 0);
+    scene.grid_scroll(-1.0);
+    hand_frames(&mut scene, &mut fixture, &mut now, 120);
+    let period = scene.period.expect("grid connected");
+    assert!(drawn(&scene).contains(&LAST_WALL) && drawn(&scene).contains(&0));
+    assert!((0.0..period).contains(&scene.camera_pos()));
+
+    scene.camera.snap(period - scene.gp.total_h());
+    scene.grid_scroll(2.0);
+    hand_frames(&mut scene, &mut fixture, &mut now, 120);
+    assert!(drawn(&scene).contains(&LAST_WALL) && drawn(&scene).contains(&0));
+    assert!((0.0..period).contains(&scene.camera_pos()));
+}
+
+fn reanchored(scene: &SceneCore, mode: Mode) {
+    assert!(drawn(scene).contains(&scene.current), "{mode:?} keeps current");
+    assert_eq!(scene.camera.x, scene.camera.target, "{mode:?} snapped");
+    assert_eq!(scene.camera.v, 0.0, "{mode:?} velocity");
+}
+
+#[test]
+fn ring_off_reanchors() {
+    for mode in JUMP_MODES {
+        let (mut scene, mut fixture, mut now) =
+            settled_scene(mode, true, LONG_JUMP_WALLS, LAST_WALL - 1);
+        assert!(scene.connected(), "{mode:?}");
+        scene.loop_around = false;
+        scene.motion.needs_frame = true;
+        hand_frames(&mut scene, &mut fixture, &mut now, 1);
+        assert!(!scene.connected(), "{mode:?}");
+        reanchored(&scene, mode);
+    }
+}
+
+#[test]
+fn ring_resize_reanchors() {
+    for mode in JUMP_MODES {
+        let (mut scene, mut fixture, mut now) =
+            settled_scene(mode, true, LONG_JUMP_WALLS, LAST_WALL - 1);
+        let kept = LONG_JUMP_WALLS / 2;
+        fixture.1.truncate(kept);
+        scene.current = kept - 1;
+        scene.motion.needs_frame = true;
+        hand_frames(&mut scene, &mut fixture, &mut now, 1);
+        assert!(scene.connected(), "{mode:?}");
+        reanchored(&scene, mode);
+    }
+}
+
+#[test]
+fn small_library_no_repeat() {
+    for mode in JUMP_MODES {
+        let (on, _, _) = settled_scene(mode, true, 4, 0);
+        let (off, _, _) = settled_scene(mode, false, 4, 0);
+        assert!(!on.connected(), "{mode:?}");
+        assert_eq!(drawn(&on), drawn(&off), "{mode:?} repeats");
+    }
+}
+
+#[test]
+fn loop_off_linear() {
+    for mode in JUMP_MODES {
+        let (scene, _, _) = settled_scene(mode, false, LONG_JUMP_WALLS, 0);
+        assert!(!scene.connected() && !drawn(&scene).contains(&LAST_WALL), "{mode:?}");
+    }
+}
+
+#[test]
+fn short_step_glides() {
+    for (mode, to) in [
+        (Mode::Slices, 1),
+        (Mode::Depth, 1),
+        (Mode::Hex, 3),
+        (Mode::Grid, 16),
+        (Mode::Sandy, 1),
+        (Mode::Collection, 1),
+    ] {
+        let (mut scene, mut fixture, mut now) = settled_scene(mode, false, LONG_JUMP_WALLS, 0);
+        scene.set_current(to, LONG_JUMP_WALLS);
+        hand_frames(&mut scene, &mut fixture, &mut now, 1);
+        assert!(scene.camera_pos() != scene.camera_target(), "{mode:?}");
+    }
+}
+
+#[test]
+fn hover_never_snaps() {
+    let mut scene = test_scene(Mode::Grid);
+    scene.viewport = (1200.0, 700.0);
+    scene.camera.snap(0.0);
+    scene.camera.retarget(5000.0);
+    scene.set_current(500, LONG_JUMP_WALLS);
+    assert!(!scene.camera_jump);
+    assert_eq!(scene.camera_pos(), 0.0);
+}
+
+#[test]
+fn rebuild_clears_camera_jump() {
+    let mut scene = hand_scene();
+    scene.set_mode(Mode::Hand);
+    scene.camera_jump = true;
+    let mut fixture = hand_fixture(10);
+    let mut now = Instant::now();
+    hand_frames(&mut scene, &mut fixture, &mut now, 1);
+    assert!(!scene.camera_jump);
+}
+
+#[test]
+fn new_scene_is_visible() {
+    let scene = test_scene(Mode::Grid);
+    assert!(scene.motion.entrance.settled());
+    assert_eq!(scene.open_fade(), 1.0);
 }

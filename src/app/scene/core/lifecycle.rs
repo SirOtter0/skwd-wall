@@ -305,6 +305,11 @@ impl SceneCore {
         }
     }
 
+    pub fn await_window(&mut self) {
+        self.motion.entrance.snap(self.motion.open_fade_from);
+        self.motion.entrance_pending = false;
+    }
+
     pub fn begin_open_fade(&mut self) {
         if self.motion.launch_anim == LaunchAnim::None || self.motion.open_fade_ms <= 0.0 {
             self.motion.entrance.snap(1.0);
@@ -515,6 +520,9 @@ impl SceneCore {
         self.card.hex_scales.clear();
         self.hover = None;
         self.camera.snap(0.0);
+        self.camera_jump = false;
+        self.period = None;
+        self.ring = None;
         self.layout_camera_anchor =
             matches!(mode, Mode::Slices | Mode::Depth | Mode::Hex | Mode::Collection);
         self.card.filter_cache.clear();

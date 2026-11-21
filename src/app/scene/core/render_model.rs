@@ -7,11 +7,12 @@ use crate::frontend::scene::layout::{self, CardCorners, Hit, Mode};
 use crate::frontend::scene::{
     Chrome, InstanceRaw, RenderSnapshot, TransSnap, apply_entrance_motion,
 };
-use crate::infrastructure::preview::is_webp;
+use crate::infrastructure::preview::is_thumb;
 use crate::rendering::scene::atlas::AtlasMap;
 
 use super::super::widget::shimmer_eligible;
 use super::atlas_helpers::{atlas_debug_enabled, audit_atlas, enqueue_far, enqueue_near};
+use super::frame::{edges, from_edges};
 use super::layout_helpers::{
     CardSpec, STORM_CUTOFF, THUMB_H, THUMB_W, chrome_kind, near_qualifies,
 };
@@ -46,33 +47,26 @@ impl SceneCore {
             wanted: &mut wanted,
         };
 
-        let mut clip = match self.mode {
-            Mode::Slices => {
-                self.rebuild_slices(&mut ctx, &mut sinks, entrance);
-                None
+        self.period = None;
+        let (natural, mut clip) = match self.mode {
+            Mode::Slices => (self.rebuild_slices(&mut ctx, &mut sinks, entrance), None),
+            Mode::Depth => (self.rebuild_depth(&mut ctx, &mut sinks, entrance), None),
+            Mode::Collection => (self.rebuild_collection(&mut ctx, &mut sinks, entrance), None),
+            Mode::Grid => {
+                let clip = self.rebuild_grid(&mut ctx, &mut sinks, entrance);
+                (clip.map(from_edges), clip)
             }
-            Mode::Depth => {
-                self.rebuild_depth(&mut ctx, &mut sinks, entrance);
-                None
-            }
-            Mode::Collection => {
-                self.rebuild_collection(&mut ctx, &mut sinks, entrance);
-                None
-            }
-            Mode::Grid => self.rebuild_grid(&mut ctx, &mut sinks, entrance),
-            Mode::Hex => {
-                self.rebuild_hex(&mut ctx, &mut sinks, entrance);
-                None
-            }
+            Mode::Hex => (self.rebuild_hex(&mut ctx, &mut sinks, entrance), None),
             Mode::Sandy => {
                 self.rebuild_sandy(&mut ctx, &mut sinks, entrance);
-                None
+                (Some(self.screen_frame()), None)
             }
             Mode::Hand => {
                 self.rebuild_hand(&mut ctx, &mut sinks, entrance);
-                None
+                (Some(self.screen_frame()), None)
             }
         };
+        self.camera_jump = false;
         self.rebuild_flip_overlay(&mut ctx, sinks.instances, sinks.wanted);
         let prefetch_n = ctx.filtered.len();
         self.prefetch_ring(&mut ctx, sinks.wanted, prefetch_n);
@@ -93,21 +87,20 @@ impl SceneCore {
         });
         apply_entrance_motion(&mut instances, self.motion.launch_anim, entrance, vw, vh);
         let mut back = self.card.pending_back.take();
-        let mut sandy = self.sandy.snap.take();
-        if let Some((placement, target)) = self.frame_placement(&hits, clip) {
+        let sandy = self.sandy.snap.take();
+        if let Some((placement, target)) = self.frame_placement(natural) {
             placement.instances(&mut instances);
             placement.hits(&mut hits);
             placement.chrome(&mut chrome);
             if let Some(panel) = &mut back {
                 placement.back(panel);
             }
-            if let Some(snap) = &mut sandy {
-                placement.sandy(snap);
-            }
             if let Some(trans) = &mut transition {
                 placement.transition(trans);
             }
-            clip = Some([target.x, target.y, target.x + target.width, target.y + target.height]);
+            if self.frame_sizes_picker() {
+                clip = Some(edges(target));
+            }
         }
         if atlas_debug_enabled() {
             audit_atlas(
@@ -180,7 +173,7 @@ impl SceneCore {
                 && near_qualifies(is_cur, storm, rect[2] * 2.0, rect[3] * 2.0)
                 && !atlas.near.is_known(store_idx)
                 && !atlas.near_failed.contains(&store_idx)
-                && is_webp(&item.thumb)
+                && is_thumb(&item.thumb)
             {
                 enqueue_near(ctx.pool, atlas, item, store_idx, true, self.direct_thumbnails);
             }
@@ -188,7 +181,7 @@ impl SceneCore {
         atlas.far.pin(store_idx);
         if !atlas.far.is_known(store_idx)
             && !atlas.failed.contains(&store_idx)
-            && is_webp(&item.thumb)
+            && is_thumb(&item.thumb)
         {
             enqueue_far(ctx.pool, atlas, item, store_idx, true, self.direct_thumbnails);
         }
@@ -206,7 +199,7 @@ impl SceneCore {
         if shimmer_eligible(
             mode,
             self.mode,
-            is_webp(&item.thumb),
+            is_thumb(&item.thumb),
             atlas.failed.contains(&store_idx),
             atlas.near_failed.contains(&store_idx),
         ) {

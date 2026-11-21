@@ -1,3 +1,6 @@
+use iced::Rectangle;
+
+use super::layout_helpers::vis_range;
 use super::model::{RebuildCtx, RebuildSinks, SceneCore};
 
 impl SceneCore {
@@ -6,23 +9,28 @@ impl SceneCore {
         ctx: &mut RebuildCtx<'_>,
         sinks: &mut RebuildSinks<'_>,
         entrance: f32,
-    ) {
+    ) -> Option<Rectangle> {
         let count = ctx.filtered.len();
         if count == 0 {
-            return;
+            return None;
         }
         self.current = self.current.min(count - 1);
         self.camera.set_zeta(1.0);
+        let radius = (self.sp.visible_count.clamp(3, 21) as f32 - 1.0) * 0.5;
+        self.set_period(count as f32, count as f32, 2.0 * (radius + 1.0), count);
         if self.layout_camera_anchor {
             self.camera.snap(self.current as f32);
             self.layout_camera_anchor = false;
         } else {
-            self.camera.retarget(self.current as f32);
+            self.aim_camera(self.current as f32, 2.0 * radius + 1.0);
         }
-        let center = self.camera.x.clamp(0.0, count.saturating_sub(1) as f32);
+        let center = if self.connected() {
+            self.camera.x
+        } else {
+            self.camera.x.clamp(0.0, count.saturating_sub(1) as f32)
+        };
         let falloff = self.xp.depth.falloff;
         let spacing = self.xp.depth.spacing;
-        let radius = (self.sp.visible_count.clamp(3, 21) as f32 - 1.0) * 0.5;
         let parallax_extent = depth_offset(radius + 1.0, falloff);
         let height = self.sp.slice_h.max(1.0);
         let width = self.xp.depth.width;
@@ -34,15 +42,14 @@ impl SceneCore {
         let height = height * fit;
         let cx = self.center_x();
         let cy = self.viewport.1 * 0.5;
-        let low = ((center - radius - 1.0).floor().max(0.0) as usize).min(count - 1);
-        let high = ((center + radius + 1.0).ceil() as usize).min(count - 1);
-        self.vis_lo = low;
-        self.vis_hi = high;
-        let mut visible: Vec<usize> = (low..=high).collect();
+        let (low, high) = self.slot_window(center, radius + 1.0, count);
+        (self.vis_lo, self.vis_hi) = vis_range(Some((low, high)), self.current, count);
+        let mut visible: Vec<i64> = (low..=high).collect();
         visible.sort_by(|&a, &b| (b as f32 - center).abs().total_cmp(&(a as f32 - center).abs()));
         self.card.filter_cache.clear();
-        for idx in visible {
-            let n = idx as f32 - center;
+        for slot in visible {
+            let idx = slot.rem_euclid(count as i64) as usize;
+            let n = slot as f32 - center;
             let scale = 1.0 / (1.0 + falloff * n.abs());
             let opacity =
                 crate::frontend::animation::smoothstep((radius + 1.0 - n.abs()).clamp(0.0, 1.0))
@@ -76,6 +83,8 @@ impl SceneCore {
             );
         }
         self.push_flip_old(sinks.instances, sinks.wanted);
+        let half_span = natural_span * fit;
+        Some(Rectangle { x: cx - half_span, y: cy - height * 0.5, width: 2.0 * half_span, height })
     }
 }
 
