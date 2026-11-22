@@ -5,6 +5,7 @@ Community-maintained port by **SirOtter0** for **Void Linux x86_64 glibc with ru
 - [Download the signed beta29_2 release](https://github.com/SirOtter0/skwd-void-repo/releases/tag/xbps-beta29_2)
 - [Install, update, uninstall and roll back](https://github.com/SirOtter0/skwd-void-repo/releases/download/xbps-beta29_2/BETA29-2-SIGNED-INSTALLATION.md)
 - [Build and reproduce the beta29_2 packages](docs/void/BETA29-2-REBUILD.md)
+- [Review the Void integration for Skwd-release](docs/void/UPSTREAM.md)
 - [Report Void packaging issues](https://github.com/SirOtter0/skwd-void-repo/issues)
 
 Authenticate the public key and verify `SHA256SUMS.sig` before using the package index. The original sources and license notices ship alongside the XBPS files. No systemd dependency, service activation or desktop configuration changes are required by the packages.
