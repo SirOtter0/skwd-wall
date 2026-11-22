@@ -1,0 +1,7 @@
+rsqlite-vfs 0.2.0 is a source-distribution dependency recorded in the
+beta.29 Deck lockfile. Cargo metadata filtered for
+x86_64-unknown-linux-gnu did not select it. The registry vendor
+manifest declares MIT. Its recorded source commit supplies the
+accompanying MIT notice.
+
+https://github.com/Spxg/sqlite-wasm-rs/blob/3d8318430bacd7d6a1aafdf5b5e54fb0fee8d451/LICENSE

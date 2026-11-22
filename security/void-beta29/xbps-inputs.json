@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0beta29_2",
+  "upstream_commit": "92202807ba4edc239ef723edeed2026b832bbc62",
+  "validated_port_commit": "d4fc5d9a03fb61047b57f7c67fe7c0a4e14f14a2",
+  "receipt_sha256": "fac20b5c98e29bab2ce43f42349c84937d3234fee005ee11dbde80f4d691cabd",
+  "native_manifest_sha256": "ea0e3cbeb53fad0e048a23980d27ba3a0251f79147f5d7f13d0caf323bd8217d",
+  "executables": {
+    "skwd-helm": "e72618b1cf684763481befdfd9b6892fe90dc68bd6b02ca7e75b75ae4a038f74",
+    "skwd-wall-draw": "2e3faa670cc62634df91c58e262cec30f6d3835893a9baf7f8170c30f99d8bf2",
+    "skwd-wall-effects": "25597380c03df0be40ab9bc9b45689137ebaa365eb1af98903a1678164ed31a3",
+    "skwd-wall-scan": "2e205291ca3f06e4a7e24763c29a34a999741a878e690728ccc4b9813c33e30f",
+    "skwd-walld": "60e261e57e8ba76dc06845e985c606b575229a2729bf4848a9069d702b5832eb",
+    "skwd-lens": "4f2ed1f5526733e8f4f25775c71d373aaabf26ea79d964b3b04f3c779d36f7ee",
+    "skwd-paper": "7b3d74c2e177cab1610f31256c6a4705f2b35d7c42a19c5eff1bbf43bb5eb051",
+    "skwd-wall-still": "bdf1d0bdd5fa2141858c99e077abe13621796bb71f325808a8b9c139344c5182",
+    "skwd-wall-vk": "7d9939d456bc27e2c972260610674fada493267b548608aaf84a61b857e0237f",
+    "skwd-wall": "b67c6f513325569d6020b1f8eeb1471c97f9a09adfb8173e62c2fd1483b8cbf1"
+  },
+  "libraries": {
+    "libavcodec.so.63.24.100": "c189c9721c50740be550274556f40497bb5a19d1990582d7f23284577ac5d758",
+    "libavformat.so.63.16.100": "30dae4b0c5f676a3f1dc2b43212e71c3b016232c995dd84cca7b7d56fc7bb929",
+    "libavutil.so.61.19.100": "47339a2049d3d6997974f6b27046b300c92c235eab277881f6c3eacbcb89e6ad",
+    "libswresample.so.7.6.100": "8010016ae18d0df63ad00878bf0cef200357d671672413313d0bc24a612dcb89",
+    "libswscale.so.10.5.100": "a034df0cd5ab62ba8cc0fbcf8b4a4e5f26c4f2809f618ff57961447f62527299"
+  }
+}

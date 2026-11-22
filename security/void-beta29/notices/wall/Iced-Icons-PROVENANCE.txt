@@ -1,0 +1,19 @@
+Iced-Icons.ttf from iced_graphics 0.14.0
+SHA-256: 2289860dbd2201295bf451deb155561abf4b1fb06899d6f1f81eb294bfebb7ec
+
+Iced's project notice is supplied in Iced-MIT.txt. Iced distributes this
+font and documents its Fontello origin. The glyphs U+E800, U+F00C and
+U+E802 through U+E805 trace to Font Awesome 4.7.0 via Fontello. Iced's
+font selects and remaps those glyphs and adds the Iced logo at U+E801.
+
+Copyright Dave Gandy 2016. All rights reserved.
+Font Awesome font glyphs: SIL Open Font License 1.1.
+See Font-Awesome-OFL-1.1.txt for the complete license.
+The Iced logo was added in PR #2902. Its individual licensing under OFL
+has not been established. Review coverage of the combined font before
+authorizing redistribution.
+
+https://github.com/iced-rs/iced/blob/3997291f318a8bc06fa522f5579836fb3feb94df/graphics/fonts/Iced-Icons.ttf
+https://github.com/iced-rs/iced/pull/2902
+https://github.com/fontello/awesome-uni.font/blob/29d4e3ff028fc850a21b5eaafde0a83f22f59cf1/config.yml
+https://fontawesome.com/v4/license/

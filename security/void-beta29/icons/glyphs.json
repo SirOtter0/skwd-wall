@@ -1,0 +1,626 @@
+{
+  "wall": {
+    "original_sha256": "71db104aa66567d0efe0b98758f9dfc1895573a453fe85fb53d1c38544a55106",
+    "experimental_sha256": "79fe2b4039484f5db30ab9c9f8215cf9dd4d3aa9f8c31c93174d90a4e03ca64a",
+    "glyphs": [
+      {
+        "unicode": "EAE7",
+        "original": "cod-eye_closed",
+        "tabler": "eye-off",
+        "reference_bounds": [
+          0,
+          -239,
+          1706,
+          1467
+        ],
+        "bounds": [
+          0.36363636363636376,
+          -238.63636363636363,
+          1706.25,
+          1466.8461538461538
+        ],
+        "advance": 1706
+      },
+      {
+        "unicode": "F00F0",
+        "original": "md-calendar_clock",
+        "tabler": "calendar-time",
+        "reference_bounds": [
+          0,
+          -326,
+          1708,
+          1554
+        ],
+        "bounds": [
+          0,
+          -239.624,
+          1708.1948051948052,
+          1467.4117647058824
+        ],
+        "advance": 1708
+      },
+      {
+        "unicode": "F0141",
+        "original": "md-chevron_left",
+        "tabler": "chevron-left",
+        "reference_bounds": [
+          0,
+          102,
+          632,
+          1126
+        ],
+        "bounds": [
+          24.0,
+          102.18032786885246,
+          608.1076923076923,
+          1126.1176470588234
+        ],
+        "advance": 632
+      },
+      {
+        "unicode": "F0142",
+        "original": "md-chevron_right",
+        "tabler": "chevron-right",
+        "reference_bounds": [
+          0,
+          102,
+          632,
+          1126
+        ],
+        "bounds": [
+          23.837209302325583,
+          101.96774193548387,
+          608.5,
+          1126.0
+        ],
+        "advance": 632
+      },
+      {
+        "unicode": "F0156",
+        "original": "md-close",
+        "tabler": "x",
+        "reference_bounds": [
+          0,
+          18,
+          1192,
+          1210
+        ],
+        "bounds": [
+          0.5,
+          17.985915492957748,
+          1191.986301369863,
+          1210.0
+        ],
+        "advance": 1192
+      },
+      {
+        "unicode": "F01DA",
+        "original": "md-download",
+        "tabler": "download",
+        "reference_bounds": [
+          0,
+          -112,
+          1192,
+          1340
+        ],
+        "bounds": [
+          0,
+          -15,
+          1192,
+          1243
+        ],
+        "advance": 1192
+      },
+      {
+        "unicode": "F0238",
+        "original": "md-fire",
+        "tabler": "flame-filled",
+        "reference_bounds": [
+          1.0,
+          -153.69230769230768,
+          1195.5,
+          1382
+        ],
+        "bounds": [
+          14.237288135593221,
+          -153.4390243902439,
+          1182,
+          1382.0
+        ],
+        "advance": 1194
+      },
+      {
+        "unicode": "F024B",
+        "original": "md-folder",
+        "tabler": "folder-filled",
+        "reference_bounds": [
+          0,
+          -70,
+          1704,
+          1298
+        ],
+        "bounds": [
+          49,
+          -70,
+          1655,
+          1298
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F02D1",
+        "original": "md-heart",
+        "tabler": "heart-filled",
+        "reference_bounds": [
+          0,
+          -168,
+          1704,
+          1396
+        ],
+        "bounds": [
+          -0.09929078014184256,
+          -154.33333333333334,
+          1703.890625,
+          1381.7543859649122
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F02D5",
+        "original": "md-heart_outline",
+        "tabler": "heart",
+        "reference_bounds": [
+          0,
+          -168,
+          1704,
+          1396
+        ],
+        "bounds": [
+          0.17721518987341778,
+          -152.0,
+          1704.1702127659576,
+          1380.1075268817203
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F02DA",
+        "original": "md-history",
+        "tabler": "history",
+        "reference_bounds": [
+          0,
+          -154,
+          1792.0,
+          1382
+        ],
+        "bounds": [
+          128,
+          -154.33333333333334,
+          1664.0131578947369,
+          1382
+        ],
+        "advance": 1792
+      },
+      {
+        "unicode": "F0349",
+        "original": "md-magnify",
+        "tabler": "search",
+        "reference_bounds": [
+          0.0,
+          -132,
+          1492,
+          1360
+        ],
+        "bounds": [
+          0.235294117647058,
+          -131.125,
+          1491.7936507936508,
+          1359.3157894736842
+        ],
+        "advance": 1492
+      },
+      {
+        "unicode": "F03D8",
+        "original": "md-palette",
+        "tabler": "palette-filled",
+        "reference_bounds": [
+          0.0,
+          -154,
+          1536,
+          1382
+        ],
+        "bounds": [
+          0,
+          -154,
+          1536.2190476190476,
+          1381.5633802816901
+        ],
+        "advance": 1536
+      },
+      {
+        "unicode": "F040A",
+        "original": "md-play",
+        "tabler": "player-play-filled",
+        "reference_bounds": [
+          0,
+          18,
+          936,
+          1210
+        ],
+        "bounds": [
+          0,
+          53,
+          936.0,
+          1175.0
+        ],
+        "advance": 936
+      },
+      {
+        "unicode": "F0493",
+        "original": "md-cog",
+        "tabler": "settings-filled",
+        "reference_bounds": [
+          1.2352941176470589,
+          -238,
+          1661.7368421052631,
+          1466
+        ],
+        "bounds": [
+          1,
+          -218.28,
+          1662,
+          1446.469387755102
+        ],
+        "advance": 1660
+      },
+      {
+        "unicode": "F04FB",
+        "original": "md-tag_multiple",
+        "tabler": "tags",
+        "reference_bounds": [
+          0,
+          -70.0,
+          1704.0,
+          1298
+        ],
+        "bounds": [
+          0,
+          -67,
+          1704.080808080808,
+          1295
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F051F",
+        "original": "md-timer_sand",
+        "tabler": "hourglass",
+        "reference_bounds": [
+          0,
+          -238,
+          1024,
+          1466
+        ],
+        "bounds": [
+          0,
+          -116,
+          1024,
+          1344
+        ],
+        "advance": 1024
+      },
+      {
+        "unicode": "F057E",
+        "original": "md-volume_high",
+        "tabler": "volume",
+        "reference_bounds": [
+          0,
+          -134,
+          1536.0,
+          1362
+        ],
+        "bounds": [
+          0,
+          -70,
+          1536.0104166666667,
+          1298
+        ],
+        "advance": 1536
+      },
+      {
+        "unicode": "F05F9",
+        "original": "md-incognito",
+        "tabler": "spy",
+        "reference_bounds": [
+          0,
+          -197,
+          1704,
+          1424.6333333333334
+        ],
+        "bounds": [
+          0.11538461538461675,
+          -153.54444444444445,
+          1703.8846153846155,
+          1382.0
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F062E",
+        "original": "md-tune",
+        "tabler": "adjustments-horizontal",
+        "reference_bounds": [
+          0,
+          -154,
+          1536,
+          1382
+        ],
+        "bounds": [
+          2.0,
+          -153.609756097561,
+          1534.0,
+          1382
+        ],
+        "advance": 1536
+      },
+      {
+        "unicode": "F072C",
+        "original": "md-widgets",
+        "tabler": "layout-grid-filled",
+        "reference_bounds": [
+          0,
+          -210,
+          1648,
+          1438
+        ],
+        "bounds": [
+          0,
+          -210,
+          1648,
+          1438
+        ],
+        "advance": 1648
+      },
+      {
+        "unicode": "F075F",
+        "original": "md-volume_mute",
+        "tabler": "volume-off",
+        "reference_bounds": [
+          0,
+          -70,
+          1620,
+          1298
+        ],
+        "bounds": [
+          124.64864864864865,
+          -70.35135135135135,
+          1495.1285714285714,
+          1298.047619047619
+        ],
+        "advance": 1620
+      },
+      {
+        "unicode": "F0764",
+        "original": "md-square",
+        "tabler": "square-filled",
+        "reference_bounds": [
+          0,
+          -154,
+          1536,
+          1382
+        ],
+        "bounds": [
+          2.0,
+          -154.0,
+          1534,
+          1382.0
+        ],
+        "advance": 1536
+      },
+      {
+        "unicode": "F076E",
+        "original": "md-dice_multiple",
+        "tabler": "dice-5-filled",
+        "reference_bounds": [
+          0,
+          -154,
+          1536,
+          1382
+        ],
+        "bounds": [
+          0,
+          -154,
+          1536.0,
+          1382.0
+        ],
+        "advance": 1536
+      },
+      {
+        "unicode": "F0A24",
+        "original": "md-aspect_ratio",
+        "tabler": "aspect-ratio",
+        "reference_bounds": [
+          0,
+          -154,
+          1880,
+          1382
+        ],
+        "bounds": [
+          0,
+          -141,
+          1880,
+          1369
+        ],
+        "advance": 1880
+      },
+      {
+        "unicode": "F0B74",
+        "original": "md-card_bulleted_settings",
+        "tabler": "list-details",
+        "reference_bounds": [
+          0,
+          -240,
+          1704,
+          1468
+        ],
+        "bounds": [
+          0,
+          -152,
+          1704.175,
+          1380
+        ],
+        "advance": 1704
+      },
+      {
+        "unicode": "F0CB8",
+        "original": "md-playlist_music",
+        "tabler": "playlist",
+        "reference_bounds": [
+          0,
+          16,
+          1620,
+          1212
+        ],
+        "bounds": [
+          146.68421052631578,
+          15.986301369863014,
+          1474.0,
+          1212
+        ],
+        "advance": 1620
+      }
+    ]
+  },
+  "iced": {
+    "original_sha256": "2289860dbd2201295bf451deb155561abf4b1fb06899d6f1f81eb294bfebb7ec",
+    "experimental_sha256": "3193b235c44c5b30783e1ec777d7e1a4bc80bc4565910f5c94184706f2c4d647",
+    "glyphs": [
+      {
+        "unicode": "E800",
+        "original": "down-dir",
+        "tabler": "caret-down-filled",
+        "reference_bounds": [
+          0.0,
+          171.0,
+          571.0833333333334,
+          493
+        ],
+        "bounds": [
+          3.25,
+          171.0,
+          567.8787878787879,
+          493
+        ],
+        "advance": 571
+      },
+      {
+        "unicode": "E801",
+        "original": "iced",
+        "tabler": "snowflake",
+        "reference_bounds": [
+          72,
+          -80,
+          928,
+          782
+        ],
+        "bounds": [
+          121.92307692307692,
+          -80,
+          878.4545454545455,
+          782.060606060606
+        ],
+        "advance": 1000
+      },
+      {
+        "unicode": "E802",
+        "original": "uniE802",
+        "tabler": "chevron-up",
+        "reference_bounds": [
+          50.0,
+          5.0,
+          950.0,
+          582.0
+        ],
+        "bounds": [
+          50.30769230769231,
+          36.09090909090909,
+          949.8928571428571,
+          550.5
+        ],
+        "advance": 1000
+      },
+      {
+        "unicode": "E803",
+        "original": "uniE803",
+        "tabler": "chevron-down",
+        "reference_bounds": [
+          50.0,
+          -25.0,
+          950.0,
+          553.0
+        ],
+        "bounds": [
+          50.08571428571429,
+          6.5,
+          949.6923076923077,
+          521.5
+        ],
+        "advance": 1000
+      },
+      {
+        "unicode": "E804",
+        "original": "uniE804",
+        "tabler": "chevron-left",
+        "reference_bounds": [
+          86.0,
+          -64.0,
+          664.0,
+          836.0
+        ],
+        "bounds": [
+          118.0,
+          -63.90909090909091,
+          631.8771929824561,
+          835.7857142857143
+        ],
+        "advance": 714
+      },
+      {
+        "unicode": "E805",
+        "original": "uniE805",
+        "tabler": "chevron-right",
+        "reference_bounds": [
+          50.0,
+          -64.0,
+          628.0,
+          836.0
+        ],
+        "bounds": [
+          81.75,
+          -63.69230769230769,
+          596.0,
+          836.0
+        ],
+        "advance": 714
+      },
+      {
+        "unicode": "F00C",
+        "original": "ok",
+        "tabler": "check",
+        "reference_bounds": [
+          68.0,
+          1.0,
+          933,
+          664.0
+        ],
+        "bounds": [
+          67.85714285714286,
+          27.444444444444443,
+          932.9310344827586,
+          638
+        ],
+        "advance": 1000
+      }
+    ]
+  }
+}

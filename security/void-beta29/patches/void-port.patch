@@ -1,0 +1,152 @@
+--- a/skwd-wall/Cargo.toml
++++ b/skwd-wall/Cargo.toml
+@@ -87,6 +87,7 @@
+ wl-clipboard-rs = "=0.9.4"
+ 
+ [patch.crates-io]
++cryoglyph = { path = "vendor-patches/cryoglyph-0.1.0" }
+ iced_layershell = { git = "https://github.com/liixini/skwd-iced-layershell.git", rev = "229fcc7c928e3e0a37b99d1822cfdad84fed450f" }
+ iced_wgpu = { git = "https://github.com/liixini/skwd-iced-wgpu.git", rev = "2ab8bbebec0e31ee24fb919b97cfcbab94ab9ad8" }
+ 
+--- a/skwd-wall/src/frontend/ui/misc/typography.rs
++++ b/skwd-wall/src/frontend/ui/misc/typography.rs
+@@ -4,7 +4,7 @@
+ 
+ pub const NERD_FONT: Font = Font::with_name("Symbols Nerd Font");
+ 
+-pub const UI_FONT_FAMILY: &str = "Roboto Condensed";
++pub const UI_FONT_FAMILY: &str = "Skwd Void UI";
+ 
+ pub const UI_FONT: Font = Font {
+     family: iced::font::Family::Name(UI_FONT_FAMILY),
+--- a/skwd-wall/src/infrastructure/preview/transition.rs
++++ b/skwd-wall/src/infrastructure/preview/transition.rs
+@@ -31,23 +31,30 @@
+     }
+ }
+ 
+-const STOCK_A: (&str, &[u8]) =
+-    ("Tori-Jade.webp", include_bytes!("../../../data/preview/Tori-Jade.webp"));
+-const STOCK_B: (&str, &[u8]) =
+-    ("Flower-3.webp", include_bytes!("../../../data/preview/Flower-3.webp"));
++pub(crate) fn stock_pair(cache_dir: &str) -> Option<(String, String)> {
++    use image::ImageEncoder as _;
+ 
+-pub(crate) fn stock_pair(cache_dir: &str) -> Option<(String, String)> {
+     let dir = std::path::Path::new(cache_dir).join("transition-preview");
+-    let mut out = Vec::with_capacity(2);
+-    for (name, bytes) in [STOCK_A, STOCK_B] {
+-        let path = dir.join(name);
+-        if path.metadata().map(|meta| meta.len()).ok() != Some(bytes.len() as u64) {
+-            std::fs::create_dir_all(&dir).ok()?;
+-            std::fs::write(&path, bytes).ok()?;
++    let from = dir.join("neutral-v1-from.png");
++    let to = dir.join("neutral-v1-to.png");
++    for (path, reverse) in [(&from, false), (&to, true)] {
++        if path.is_file() {
++            continue;
+         }
+-        out.push(path.to_string_lossy().into_owned());
++        std::fs::create_dir_all(&dir).ok()?;
++        let pixels = image::RgbImage::from_fn(PREVIEW_W, PREVIEW_H, |x, y| {
++            let horizontal = (x * 144 / (PREVIEW_W - 1)) as u8;
++            let stripe = if (y / 30) % 2 == 0 { 16 } else { 0 };
++            let value = if reverse { 192 - horizontal } else { 24 + horizontal };
++            image::Rgb([value + stripe; 3])
++        });
++        let mut file = tempfile::NamedTempFile::new_in(&dir).ok()?;
++        image::codecs::png::PngEncoder::new(file.as_file_mut())
++            .write_image(pixels.as_raw(), PREVIEW_W, PREVIEW_H, image::ExtendedColorType::Rgb8)
++            .ok()?;
++        file.persist(path).ok()?;
+     }
+-    Some((out[0].clone(), out[1].clone()))
++    Some((from.to_string_lossy().into_owned(), to.to_string_lossy().into_owned()))
+ }
+ 
+ impl TransitionPreviewWorker {
+--- a/skwd-wall/src/infrastructure/preview/transition/tests.rs
++++ b/skwd-wall/src/infrastructure/preview/transition/tests.rs
+@@ -25,3 +25,27 @@
+     assert!(publish_frame(&latest, 7, &[5, 6, 7, 8]));
+     assert_eq!(latest.lock().unwrap().pixels.as_deref(), Some([5, 6, 7, 8].as_slice()));
+ }
++
++#[test]
++fn generated_stock_pair_decodes_and_reuses_cache() {
++    let cache = tempfile::tempdir().unwrap();
++    let cache = cache.path().to_str().unwrap();
++    let (from, to) = super::stock_pair(cache).unwrap();
++    let first = image::open(&from).unwrap().into_rgb8();
++    let second = image::open(&to).unwrap().into_rgb8();
++    assert_eq!(first.dimensions(), (PREVIEW_W, PREVIEW_H));
++    assert_eq!(second.dimensions(), (PREVIEW_W, PREVIEW_H));
++    assert_ne!(first, second);
++    let timestamps = [&from, &to].map(|path| std::fs::metadata(path).unwrap().modified().unwrap());
++    assert_eq!(super::stock_pair(cache), Some((from.clone(), to.clone())));
++    assert_eq!(
++        timestamps,
++        [&from, &to].map(|path| std::fs::metadata(path).unwrap().modified().unwrap())
++    );
++}
++
++#[test]
++fn generated_stock_pair_handles_invalid_cache_directory() {
++    let cache = tempfile::NamedTempFile::new().unwrap();
++    assert!(super::stock_pair(cache.path().to_str().unwrap()).is_none());
++}
+--- a/skwd-paper/packaging/build-ffmpeg-runtime.sh
++++ b/skwd-paper/packaging/build-ffmpeg-runtime.sh
+@@ -6,8 +6,8 @@
+     exit 2
+ fi
+ 
+-readonly ffmpeg_version="9.0.1"
+-readonly ffmpeg_sha256="cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635"
++readonly ffmpeg_version="9.1"
++readonly ffmpeg_sha256="1a4d394ae63d190a526cd052eb4415c156b5c5e2df37efab41a7de0b8fde2433"
+ readonly ffmpeg_url="https://ffmpeg.org/releases/ffmpeg-${ffmpeg_version}.tar.xz"
+ readonly install_prefix="$1"
+ 
+@@ -90,6 +90,12 @@
+ 
+ tar -xf "$archive" -C "$build_dir"
+ source_dir="$build_dir/ffmpeg-${ffmpeg_version}"
++patchdir="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)/vendor-ffmpeg/security-patches"
++(
++ cd "$source_dir"
++ git apply "$patchdir"/60bc31fcf6543505e6d2fc1a9399cca95f54ba4d.patch
++)
++
+ 
+ readonly runtime_prefix="/usr/lib/skwd-paper"
+ readonly stage_dir="$build_dir/stage"
+@@ -119,7 +125,11 @@
+         --enable-vaapi \
+         --enable-vulkan \
+         --enable-libdrm \
+-        --enable-libdav1d
++        --enable-libdav1d \
++        --disable-decoder=adpcm_ima_citrix,adpcm_rhetorex,imm6,pcm_dvda,rw2 \
++        --disable-demuxer=astc,jpeg_mpf,ktx,mvr,image_rw2_pipe \
++        --disable-parser=rw2 \
++        --disable-bsf=jpegapp,lcevc_merge,side_data,trim
+ )
+ 
+ make -C "$source_dir" -j "$build_jobs"
+--- a/skwd-wall/src/shell/tests.rs
++++ b/skwd-wall/src/shell/tests.rs
+@@ -351,11 +351,8 @@
+             let fonts = root.path().join("fonts");
+             std::fs::create_dir(&fonts).unwrap();
+             if cached {
+-                std::fs::write(
+-                    fonts.join("system.ttf"),
+-                    include_bytes!("../../assets/RobotoCondensed-Bold.ttf"),
+-                )
+-                .unwrap();
++                // Exercise a duplicate of the active UI family, including downstream renames.
++                std::fs::write(fonts.join("system.ttf"), UI_FONT_BYTES).unwrap();
+                 std::fs::write(fonts.join("symbols.ttf"), NERD_FONT_BYTES).unwrap();
+             }
+             let config = root.path().join("fonts.conf");
