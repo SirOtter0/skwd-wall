@@ -3,7 +3,7 @@
 Community-maintained port by **SirOtter0** for **Void Linux x86_64 glibc with runit**. The coordinated release `1.0.0beta29_2` contains Wall, Deck, Lens and Paper. Skwd-wall is maintained upstream by [liixini](https://github.com/liixini/skwd-wall). See the [upstream README](README-UPSTREAM.md) for application features.
 
 - [Download the signed beta29_2 release](https://github.com/SirOtter0/skwd-void-repo/releases/tag/xbps-beta29_2)
-- [Install, update, uninstall and roll back](https://github.com/SirOtter0/skwd-void-repo/blob/main/README.md#installation)
+- [Installation guide](https://github.com/SirOtter0/skwd-void-repo/blob/main/README.md#installation) · [User guide](https://github.com/SirOtter0/skwd-void-repo/blob/main/docs/USERS.md)
 - [Build and reproduce the beta29_2 packages](docs/void/BETA29-2-REBUILD.md)
 - [Review the Void integration for Skwd-release](docs/void/UPSTREAM.md)
 - [Report Void packaging issues](https://github.com/SirOtter0/skwd-void-repo/issues)
